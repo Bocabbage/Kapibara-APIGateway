@@ -8,7 +8,7 @@ package mysql
 import (
 	"database/sql"
 	"kapibara-apigateway/internal/config"
-	"log"
+	"kapibara-apigateway/internal/logger"
 	"sync"
 
 	"github.com/go-sql-driver/mysql"
@@ -53,7 +53,7 @@ func getMySQLHandler() *mysqlHandler {
 		var db *sql.DB
 		db, err = sql.Open("mysql", cfg.FormatDSN())
 		if err != nil {
-			log.Fatal("Wrong happened in mysqlHandler init.")
+			logger.Fatal("Wrong happened in mysqlHandler init.")
 		}
 		singletonHandler = &mysqlHandler{cfg: cfg, db: db}
 	})
