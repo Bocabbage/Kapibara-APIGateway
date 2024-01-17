@@ -20,5 +20,6 @@ func init() {
 	authRouter := ServerEngine.Group("/auth")
 	{
 		authRouter.POST("/login", auth.AuthLogin)
+		authRouter.POST("/register", auth.AuthRegister)
 	}
 }
