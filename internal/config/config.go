@@ -1,7 +1,10 @@
 package config
 
 import (
+	"fmt"
 	"os"
+	"path/filepath"
+	"runtime"
 	"strconv"
 
 	"github.com/joho/godotenv"
@@ -39,11 +42,16 @@ type JWTConfig struct {
 	SecretKey string
 }
 
+type HealthTestConfig struct {
+	TestConfig string
+}
+
 type Config struct {
 	LogConf    LogConfig
 	MySQLConf  MySQLConfig
 	ServerConf ServerConfig
 	JWTConf    JWTConfig
+	HealthConf HealthTestConfig
 }
 
 // global config objects
@@ -81,9 +89,26 @@ func loadGlobalConfig() {
 		Expired:   jwtExpired,
 		SecretKey: os.Getenv("JWT_SECRET_KEY"),
 	}
+	GlobalConfig.HealthConf = HealthTestConfig{
+		TestConfig: os.Getenv("TEST_CONFIG_FLAG"),
+	}
+}
+
+func loadDotEnvOnce() {
+	_, filename, _, ok := runtime.Caller(0)
+	if !ok {
+		fmt.Println("Not able to get the code-dir.")
+		return
+	}
+	dir := filepath.Dir(filename)
+
+	err := godotenv.Load(filepath.Join(dir, "../../config/.env"))
+	if err != nil {
+		fmt.Println("Load dotenv file failed.")
+	}
 }
 
 func init() {
-	godotenv.Load("../../config/.env")
+	loadDotEnvOnce()
 	loadGlobalConfig()
 }
