@@ -32,12 +32,9 @@ func (mh *mysqlHandler) query(sqlStr string) (*sql.Rows, error) {
 	return rows, err
 }
 
-func (mh *mysqlHandler) execute(sqlStr string) (int64, error) {
-	// todo: implement
-	var successInsert int64
-	var err error
-
-	return successInsert, err
+func (mh *mysqlHandler) execute(sqlStr string, args ...any) (sql.Result, error) {
+	insertResult, err := mh.db.Exec(sqlStr, args...)
+	return insertResult, err
 }
 
 func getMySQLHandler() *mysqlHandler {

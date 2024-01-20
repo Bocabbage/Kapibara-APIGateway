@@ -6,6 +6,7 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
+	kerrors "kapibara-apigateway/internal/errors"
 	"kapibara-apigateway/internal/logger"
 	"strconv"
 )
@@ -20,7 +21,7 @@ func GetPwdByAccount(account string) (string, error) {
 	err = rowResult.Scan(&pwdHash)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			logger.Error(fmt.Sprintf("[GetPwdByAccount]NoRowsError at Query sql for: %s", sqlStr))
+			logger.Warn(fmt.Sprintf("[GetPwdByAccount]NoRowsError at Query sql for: %s", sqlStr))
 		}
 	}
 
@@ -67,15 +68,16 @@ func GetUsernameByAccount(account string) (string, error) {
 func GetRecordByAccount(account string) (map[string]string, error) {
 	var username string
 	var roleBitmap string
+	var pwdHash string
 	var err error
 
 	result := make(map[string]string)
 
-	sqlStr := fmt.Sprintf("SELECT `username`, `roleBitmap` FROM `users` WHERE `account` = \"%s\"", account)
+	sqlStr := fmt.Sprintf("SELECT `username`, `pwdHash`,`roleBitmap` FROM `users` WHERE `account` = \"%s\"", account)
 
 	mysqlHandler := getMySQLHandler()
 	rowResult := mysqlHandler.queryRow(sqlStr)
-	err = rowResult.Scan(&username, &roleBitmap)
+	err = rowResult.Scan(&username, &pwdHash, &roleBitmap)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			logger.Error(fmt.Sprintf("[GetUsernameByAccount]NoRowsError at Query sql for: %s", sqlStr))
@@ -83,7 +85,29 @@ func GetRecordByAccount(account string) (map[string]string, error) {
 	} else {
 		result["username"] = username
 		result["roleBitmap"] = roleBitmap
+		result["pwdHash"] = pwdHash
 	}
 
 	return result, err
+}
+
+func RegisterNewUser(record map[string]string) error {
+	var err error
+	account, accountExist := record["account"]
+	username, nameExist := record["username"]
+	pwdHash, pwdHashExist := record["pwdHash"]
+
+	if !accountExist || !nameExist || !pwdHashExist {
+		return &kerrors.KapibaraGeneralError{
+			Code:    kerrors.KeyNotExistInMap,
+			Message: "Key-miss in map",
+		}
+	}
+
+	// [todo] Add check for getHandler
+	mysqlHandler := getMySQLHandler()
+	sqlStr := "INSERT INTO `users` (account, username, pwdHash) VALUES (?,?,?)"
+	_, err = mysqlHandler.execute(sqlStr, account, username, pwdHash)
+
+	return err
 }

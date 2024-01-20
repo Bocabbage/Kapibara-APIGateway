@@ -3,6 +3,8 @@ package cryptoutils
 import (
 	"crypto/sha256"
 	"encoding/hex"
+
+	"golang.org/x/crypto/bcrypt"
 )
 
 func Sha256Hash(input string) string {
@@ -13,4 +15,14 @@ func Sha256Hash(input string) string {
 	hasherString := hex.EncodeToString(hasherInByte)
 
 	return hasherString
+}
+
+func BCryptHash(input string) (string, error) {
+	bytes, err := bcrypt.GenerateFromPassword([]byte(input), 12)
+	return string(bytes), err
+}
+
+func BCryptHashCompare(pwd, hash string) bool {
+	err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(pwd))
+	return err == nil
 }

@@ -3,12 +3,12 @@ USE `auth_test_db0`;
 -- create tables
 
 CREATE TABLE IF NOT EXISTS `users`(
-    `accountId` INT AUTO_INCREMENT,
+    `accountId` INT PRIMARY AUTO_INCREMENT,
     `account` VARCHAR(50) UNIQUE,
-    `username` VARCHAR(50) UNIQUE,
+    `username` VARCHAR(50),
     `pwdHash` VARCHAR(100),
     `status` SMALLINT DEFAULT 0 COMMENT '0: not-in-use, 1: not-active, 2: in-use, 3: black-list',
-    `roleBitmap` INT DEFAULT 0,
+    `roleBitmap` BIGINT DEFAULT 1,
     PRIMARY KEY (`accountId`)
 ) DEFAULT CHARSET=utf8;
 

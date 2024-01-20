@@ -17,8 +17,10 @@ func main() {
 
 	serverPoint := serverConfig.ServerAddr + ":" + serverConfig.ServerPort
 	if serverConfig.IsTLS {
+		logger.Info("Start to serve in HTTPS-mode.")
 		ServerEngine.RunTLS(serverPoint, serverConfig.CertFile, serverConfig.KeyFile)
 	} else {
+		logger.Info("Start to serve in HTTP-mode.")
 		ServerEngine.Run(serverPoint)
 	}
 }
