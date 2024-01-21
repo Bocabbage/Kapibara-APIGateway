@@ -63,8 +63,10 @@ func AuthLogin(c *gin.Context) {
 			500,
 			gin.H{"error": "server internal error"},
 		)
+		return
 	}
 
+	logger.Debug(fmt.Sprintf("Login success for %s.", account))
 	c.JSON(
 		200,
 		gin.H{
@@ -81,8 +83,11 @@ func AuthRegister(c *gin.Context) {
 	username := c.PostForm("username")
 	pwd := c.PostForm("password")
 
+	logger.Debug(fmt.Sprintf("REGISTER Entered [%s].", account))
+
 	// empty account/pwd
 	if account == "" || pwd == "" {
+		logger.Debug(fmt.Sprintf("REGISTER ERROR: bcrypthash error for [%s].", account))
 		c.JSON(
 			422,
 			gin.H{"error": "REGISTER ERROR: invalid account/password."},
@@ -104,8 +109,10 @@ func AuthRegister(c *gin.Context) {
 	record["username"] = username
 	record["pwdHash"] = pwdHash
 
-	err = mysqlsdk.RegisterNewUser(record)
+	_, err = mysqlsdk.RegisterNewUser(record)
 	if err != nil {
+		logger.Debug(fmt.Sprintf("Register new user error: [%v]", err))
+		logger.Debug(fmt.Sprintf("REGISTER ERROR: record - [%v].", record))
 		c.JSON(
 			422,
 			gin.H{"error": "REGISTER ERROR: user exists."},
@@ -113,6 +120,7 @@ func AuthRegister(c *gin.Context) {
 		return
 	}
 
+	logger.Debug(fmt.Sprintf("Register success for %s.", account))
 	c.JSON(
 		200,
 		gin.H{"msg": "register success."},

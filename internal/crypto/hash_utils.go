@@ -22,7 +22,7 @@ func BCryptHash(input string) (string, error) {
 	return string(bytes), err
 }
 
-func BCryptHashCompare(pwd, hash string) bool {
+func BCryptHashCompare(hash, pwd string) bool {
 	err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(pwd))
 	return err == nil
 }

@@ -91,14 +91,14 @@ func GetRecordByAccount(account string) (map[string]string, error) {
 	return result, err
 }
 
-func RegisterNewUser(record map[string]string) error {
+func RegisterNewUser(record map[string]string) (sql.Result, error) {
 	var err error
 	account, accountExist := record["account"]
 	username, nameExist := record["username"]
 	pwdHash, pwdHashExist := record["pwdHash"]
 
 	if !accountExist || !nameExist || !pwdHashExist {
-		return &kerrors.KapibaraGeneralError{
+		return nil, &kerrors.KapibaraGeneralError{
 			Code:    kerrors.KeyNotExistInMap,
 			Message: "Key-miss in map",
 		}
@@ -107,7 +107,7 @@ func RegisterNewUser(record map[string]string) error {
 	// [todo] Add check for getHandler
 	mysqlHandler := getMySQLHandler()
 	sqlStr := "INSERT INTO `users` (account, username, pwdHash) VALUES (?,?,?)"
-	_, err = mysqlHandler.execute(sqlStr, account, username, pwdHash)
+	result, err := mysqlHandler.execute(sqlStr, account, username, pwdHash)
 
-	return err
+	return result, err
 }

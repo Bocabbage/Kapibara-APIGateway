@@ -7,13 +7,13 @@ services:
       dockerfile: ./deployments/docker/localdemo/Dockerfile
     restart: on-failure
     ports:
-      - "80:5678"
+      - "5678:80"
     depends_on:
-      - "database"
+      - "mysqldb"
     networks:
       - "kapibara-testnet"
     container_name: "kapibara-apigateway"
-  database:
+  mysqldb:
     image: "mysql:latest"
     container_name: "db-mysql0"
     build:

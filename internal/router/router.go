@@ -1,7 +1,9 @@
 package router
 
 import (
+	"fmt"
 	"kapibara-apigateway/internal/auth"
+	"kapibara-apigateway/internal/logger"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
@@ -22,4 +24,7 @@ func init() {
 		authRouter.POST("/login", auth.AuthLogin)
 		authRouter.POST("/register", auth.AuthRegister)
 	}
+
+	logger.Debug("Gin router init finished.")
+	fmt.Println("Gin router init finished.")
 }

@@ -3,7 +3,7 @@ USE `auth_test_db0`;
 -- create tables
 
 CREATE TABLE IF NOT EXISTS `users`(
-    `accountId` INT PRIMARY AUTO_INCREMENT,
+    `accountId` INT AUTO_INCREMENT,
     `account` VARCHAR(50) UNIQUE,
     `username` VARCHAR(50),
     `pwdHash` VARCHAR(100),
