@@ -5,7 +5,7 @@ USE `auth_test_db0`;
 CREATE TABLE IF NOT EXISTS `users`(
     `accountId` INT AUTO_INCREMENT,
     `account` VARCHAR(50) UNIQUE,
-    `username` VARCHAR(50),
+    `username` VARCHAR(50) NOT NULL,
     `pwdHash` VARCHAR(100),
     `status` SMALLINT DEFAULT 0 COMMENT '0: not-in-use, 1: not-active, 2: in-use, 3: black-list',
     `roleBitmap` BIGINT DEFAULT 1,

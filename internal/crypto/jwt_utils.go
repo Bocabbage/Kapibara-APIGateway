@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"kapibara-apigateway/internal/config"
 	kerrors "kapibara-apigateway/internal/errors"
+	"reflect"
 	"strconv"
 	"time"
 
@@ -65,19 +66,24 @@ func ParseJWT(tokenString string) (*JwtToken, error) {
 			}
 		}
 
-		if resultJwtToken.Exp, ok = claims["exp"].(int64); !ok {
+		if tmpExp, ok := claims["exp"].(float64); !ok {
 			return nil, &kerrors.KapibaraGeneralError{
 				Code:    kerrors.JwtTokenParseError,
-				Message: "jwttoken: exp parse failed",
+				Message: fmt.Sprintf("jwttoken: exp parse failed, claims: %v, %v", claims, reflect.TypeOf(claims["exp"])),
 			}
+		} else {
+			resultJwtToken.Exp = int64(tmpExp)
 		}
 
-		if resultJwtToken.Roles, ok = claims["roles"].(int64); !ok {
+		if tmpRoles, ok := claims["roles"].(float64); !ok {
 			return nil, &kerrors.KapibaraGeneralError{
 				Code:    kerrors.JwtTokenParseError,
-				Message: "jwttoken: roles parse failed",
+				Message: fmt.Sprintf("jwttoken: roles parse failed: %v, %v", claims, reflect.TypeOf(claims["roles"])),
 			}
+		} else {
+			resultJwtToken.Roles = int64(tmpRoles)
 		}
+
 	} else {
 		return nil, &kerrors.KapibaraGeneralError{
 			Code:    kerrors.JwtTokenParseError,
