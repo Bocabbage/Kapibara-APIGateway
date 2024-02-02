@@ -19,13 +19,13 @@ type JwtToken struct {
 
 func GenerateJWT(record map[string]string) (string, error) {
 	roleBitmap, _ := strconv.ParseInt(record["roleBitmap"], 2, 64)
-	currentTime := time.Now().Unix()
+	expTime := time.Now().Add(time.Duration(config.GlobalConfig.JWTConf.Expired) * time.Second).Unix()
 
 	token := jwt.NewWithClaims(
 		jwt.SigningMethodHS256,
 		jwt.MapClaims{
 			"username": record["username"],
-			"exp":      currentTime + config.GlobalConfig.JWTConf.Expired,
+			"exp":      expTime,
 			"roles":    roleBitmap + config.GlobalConfig.MySQLConf.Salt,
 		},
 	)

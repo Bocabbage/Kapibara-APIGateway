@@ -88,6 +88,7 @@ func AuthLogin(c *gin.Context) {
 		http.StatusOK,
 		gin.H{
 			"access_token": jwtToken,
+			"user_info":    record["username"],
 			"token_type":   "Bearer",
 			"jit":          uuid.NewV4(),
 		},
