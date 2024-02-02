@@ -30,11 +30,12 @@ type LogConfig struct {
 }
 
 type ServerConfig struct {
-	ServerAddr string
-	ServerPort string
-	IsTLS      bool
-	CertFile   string
-	KeyFile    string
+	ServerAddr   string
+	ServerPort   string
+	ServerDomain string
+	IsTLS        bool
+	CertFile     string
+	KeyFile      string
 }
 
 type JWTConfig struct {
@@ -79,11 +80,12 @@ func loadGlobalConfig() {
 		ServiceName: os.Getenv("SERVICE_NAME"),
 	}
 	GlobalConfig.ServerConf = ServerConfig{
-		ServerAddr: os.Getenv("SERVER_ADDR"),
-		ServerPort: os.Getenv("SERVER_PORT"),
-		IsTLS:      isTLS,
-		CertFile:   os.Getenv("CERT_FILE"),
-		KeyFile:    os.Getenv("KEY_FILE"),
+		ServerAddr:   os.Getenv("SERVER_ADDR"),
+		ServerPort:   os.Getenv("SERVER_PORT"),
+		ServerDomain: os.Getenv("SERVER_DOMAIN"),
+		IsTLS:        isTLS,
+		CertFile:     os.Getenv("CERT_FILE"),
+		KeyFile:      os.Getenv("KEY_FILE"),
 	}
 	GlobalConfig.JWTConf = JWTConfig{
 		Expired:   jwtExpired,

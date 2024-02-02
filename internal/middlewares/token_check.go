@@ -11,17 +11,23 @@ import (
 )
 
 func TokenValidationMid() gin.HandlerFunc {
+	// Two different token-auth way: (1) cookie (2) auth-header
 	return func(c *gin.Context) {
-		const BearerSchema = "Bearer "
-		authHeader := c.GetHeader("Authorization")
-		if len(authHeader) <= len(BearerSchema) {
-			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "auth-token required but not any legal token found."})
-			return
-		} else if authHeader[:len(BearerSchema)] != BearerSchema {
-			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "auth-token required but not any legal token found."})
-			return
+		var tokenString string
+
+		tokenString, err := c.Cookie("access_token")
+		if err != nil {
+			const BearerSchema = "Bearer "
+			authHeader := c.GetHeader("Authorization")
+			if len(authHeader) <= len(BearerSchema) {
+				c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "auth-token required but not any legal token found."})
+				return
+			} else if authHeader[:len(BearerSchema)] != BearerSchema {
+				c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "auth-token required but not any legal token found."})
+				return
+			}
+			tokenString = authHeader[len(BearerSchema):]
 		}
-		tokenString := authHeader[len(BearerSchema):]
 
 		token, err := cryptoutils.ParseJWT(tokenString)
 		if err != nil {

@@ -4,10 +4,12 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
+	"kapibara-apigateway/internal/config"
 	cryptoUtils "kapibara-apigateway/internal/crypto"
 	"kapibara-apigateway/internal/logger"
 	mysqlsdk "kapibara-apigateway/internal/mysql"
 	"net/http"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 	uuid "github.com/satori/go.uuid"
@@ -16,6 +18,8 @@ import (
 func AuthLogin(c *gin.Context) {
 	account := c.PostForm("account")
 	pwd := c.PostForm("password")
+	rememberMe := c.PostForm("rememberMe")
+	cookieNeed, _ := strconv.ParseBool(rememberMe)
 
 	// empty account/pwd
 	if account == "" || pwd == "" {
@@ -68,6 +72,18 @@ func AuthLogin(c *gin.Context) {
 	}
 
 	logger.Debug(fmt.Sprintf("Login success for %s.", account))
+	if cookieNeed {
+		// [todo] enhance cookie
+		c.SetCookie(
+			"access_token",
+			jwtToken,
+			int(config.GlobalConfig.JWTConf.Expired),
+			"/",
+			config.GlobalConfig.ServerConf.ServerDomain,
+			false,
+			true,
+		)
+	}
 	c.JSON(
 		http.StatusOK,
 		gin.H{
