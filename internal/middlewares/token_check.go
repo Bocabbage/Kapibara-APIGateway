@@ -15,7 +15,7 @@ func TokenValidationMid() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var tokenString string
 
-		tokenString, err := c.Cookie("access_token")
+		tokenString, err := c.Cookie("_kapibara_access_token")
 		if err != nil {
 			const BearerSchema = "Bearer "
 			authHeader := c.GetHeader("Authorization")

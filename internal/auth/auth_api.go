@@ -9,7 +9,6 @@ import (
 	"kapibara-apigateway/internal/logger"
 	mysqlsdk "kapibara-apigateway/internal/mysql"
 	"net/http"
-	"strconv"
 
 	"github.com/gin-gonic/gin"
 	uuid "github.com/satori/go.uuid"
@@ -18,8 +17,7 @@ import (
 func AuthLogin(c *gin.Context) {
 	account := c.PostForm("account")
 	pwd := c.PostForm("password")
-	rememberMe := c.PostForm("rememberMe")
-	cookieNeed, _ := strconv.ParseBool(rememberMe)
+	cookieNeed := true
 
 	// empty account/pwd
 	if account == "" || pwd == "" {
@@ -73,9 +71,8 @@ func AuthLogin(c *gin.Context) {
 
 	logger.Debug(fmt.Sprintf("Login success for %s.", account))
 	if cookieNeed {
-		// [todo] enhance cookie
 		c.SetCookie(
-			"access_token",
+			"_kapibara_access_token",
 			jwtToken,
 			int(config.GlobalConfig.JWTConf.Expired),
 			"/",
@@ -83,16 +80,26 @@ func AuthLogin(c *gin.Context) {
 			false,
 			true,
 		)
+		c.SetCookie(
+			"_kapibara_user_info",
+			record["username"],
+			int(config.GlobalConfig.JWTConf.Expired),
+			"/",
+			config.GlobalConfig.ServerConf.ServerDomain,
+			false,
+			true,
+		)
+	} else {
+		c.JSON(
+			http.StatusOK,
+			gin.H{
+				"access_token": jwtToken,
+				"user_info":    record["username"],
+				"token_type":   "Bearer",
+				"jit":          uuid.NewV4(),
+			},
+		)
 	}
-	c.JSON(
-		http.StatusOK,
-		gin.H{
-			"access_token": jwtToken,
-			"user_info":    record["username"],
-			"token_type":   "Bearer",
-			"jit":          uuid.NewV4(),
-		},
-	)
 
 }
 
