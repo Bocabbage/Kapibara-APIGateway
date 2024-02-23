@@ -17,7 +17,9 @@ func init() {
 	ServerEngine.Use(cors.New(cors.Config{
 		// [todo] restrict the cors
 		AllowAllOrigins: true,
-		AllowMethods:    []string{"GET", "POST"},
+		// AllowOrigins:     []string{"http://kapibara.local.com"},
+		AllowCredentials: true,
+		AllowMethods:     []string{"GET", "POST"},
 	}))
 
 	authRouter := ServerEngine.Group("/auth/v1")

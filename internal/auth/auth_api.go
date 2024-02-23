@@ -71,6 +71,7 @@ func AuthLogin(c *gin.Context) {
 
 	logger.Debug(fmt.Sprintf("Login success for %s.", account))
 	if cookieNeed {
+		// [todo] set secure=true when https enabled
 		c.SetCookie(
 			"_kapibara_access_token",
 			jwtToken,
@@ -80,6 +81,7 @@ func AuthLogin(c *gin.Context) {
 			false,
 			true,
 		)
+		// [todo] move user_info into response-body
 		c.SetCookie(
 			"_kapibara_user_info",
 			record["username"],
