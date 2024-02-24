@@ -16,8 +16,10 @@ func init() {
 	ServerEngine = gin.Default()
 	ServerEngine.Use(cors.New(cors.Config{
 		// [todo] restrict the cors
-		AllowAllOrigins: true,
-		AllowMethods:    []string{"GET", "POST"},
+		// AllowAllOrigins:  true,
+		AllowOrigins:     []string{"http://192.168.4.29", "http://kapibara.local.com:5173"}, // [todo] dev-mode
+		AllowCredentials: true,
+		AllowMethods:     []string{"GET", "POST"},
 	}))
 
 	authRouter := ServerEngine.Group("/auth/v1")

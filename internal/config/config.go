@@ -6,6 +6,7 @@ import (
 	"path/filepath"
 	"runtime"
 	"strconv"
+	"strings"
 
 	"github.com/joho/godotenv"
 )
@@ -47,12 +48,17 @@ type HealthTestConfig struct {
 	TestConfig string
 }
 
+type CORSConfig struct {
+	AllowOrigins []string
+}
+
 type Config struct {
 	LogConf    LogConfig
 	MySQLConf  MySQLConfig
 	ServerConf ServerConfig
 	JWTConf    JWTConfig
 	HealthConf HealthTestConfig
+	CORSConf   CORSConfig
 }
 
 // global config objects
@@ -93,6 +99,9 @@ func loadGlobalConfig() {
 	}
 	GlobalConfig.HealthConf = HealthTestConfig{
 		TestConfig: os.Getenv("TEST_CONFIG_FLAG"),
+	}
+	GlobalConfig.CORSConf = CORSConfig{
+		AllowOrigins: strings.Split(os.Getenv("ALLOW_ORIGINS"), ","),
 	}
 }
 

@@ -13,6 +13,7 @@ import (
 
 type JwtToken struct {
 	Username string
+	Account  string
 	Exp      int64
 	Roles    int64
 }
@@ -25,6 +26,7 @@ func GenerateJWT(record map[string]string) (string, error) {
 		jwt.SigningMethodHS256,
 		jwt.MapClaims{
 			"username": record["username"],
+			"account":  record["account"],
 			"exp":      expTime,
 			"roles":    roleBitmap + config.GlobalConfig.MySQLConf.Salt,
 		},
@@ -42,6 +44,7 @@ func GenerateJWT(record map[string]string) (string, error) {
 func ParseJWT(tokenString string) (*JwtToken, error) {
 	var resultJwtToken = JwtToken{
 		Username: "",
+		Account:  "",
 		Exp:      0,
 		Roles:    0,
 	}
@@ -63,6 +66,13 @@ func ParseJWT(tokenString string) (*JwtToken, error) {
 			return nil, &kerrors.KapibaraGeneralError{
 				Code:    kerrors.JwtTokenParseError,
 				Message: "jwttoken: username parse failed",
+			}
+		}
+
+		if resultJwtToken.Account, ok = claims["account"].(string); !ok {
+			return nil, &kerrors.KapibaraGeneralError{
+				Code:    kerrors.JwtTokenParseError,
+				Message: "jwttoken: account parse failed",
 			}
 		}
 
