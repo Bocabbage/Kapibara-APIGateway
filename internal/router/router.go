@@ -16,8 +16,8 @@ func init() {
 	ServerEngine = gin.Default()
 	ServerEngine.Use(cors.New(cors.Config{
 		// [todo] restrict the cors
-		AllowAllOrigins: true,
-		// AllowOrigins:     []string{"http://kapibara.local.com"},
+		// AllowAllOrigins:  true,
+		AllowOrigins:     []string{"http://192.168.4.29", "http://kapibara.local.com:5173"}, // [todo] dev-mode
 		AllowCredentials: true,
 		AllowMethods:     []string{"GET", "POST"},
 	}))

@@ -17,7 +17,6 @@ import (
 func AuthLogin(c *gin.Context) {
 	account := c.PostForm("account")
 	pwd := c.PostForm("password")
-	cookieNeed := true
 
 	// empty account/pwd
 	if account == "" || pwd == "" {
@@ -59,6 +58,7 @@ func AuthLogin(c *gin.Context) {
 
 	// generate jwt
 	// [todo] enhancement: decoupling jwt-format
+	record["account"] = account
 	jwtToken, err := cryptoUtils.GenerateJWT(record)
 	if err != nil {
 		logger.Error(fmt.Sprintf("LOGIN ERROR: generate jwt-token error for [%s].", account))
@@ -70,38 +70,26 @@ func AuthLogin(c *gin.Context) {
 	}
 
 	logger.Debug(fmt.Sprintf("Login success for %s.", account))
-	if cookieNeed {
-		// [todo] set secure=true when https enabled
-		c.SetCookie(
-			"_kapibara_access_token",
-			jwtToken,
-			int(config.GlobalConfig.JWTConf.Expired),
-			"/",
-			config.GlobalConfig.ServerConf.ServerDomain,
-			false,
-			true,
-		)
-		// [todo] move user_info into response-body
-		c.SetCookie(
-			"_kapibara_user_info",
-			record["username"],
-			int(config.GlobalConfig.JWTConf.Expired),
-			"/",
-			config.GlobalConfig.ServerConf.ServerDomain,
-			false,
-			true,
-		)
-	} else {
-		c.JSON(
-			http.StatusOK,
-			gin.H{
-				"access_token": jwtToken,
-				"user_info":    record["username"],
-				"token_type":   "Bearer",
-				"jit":          uuid.NewV4(),
-			},
-		)
-	}
+	// [todo]
+	// 1. set secure=true when https enabled
+	// 2. set the domain to api.kapibara
+	c.SetCookie(
+		"_kapibara_access_token",
+		jwtToken,
+		int(config.GlobalConfig.JWTConf.Expired),
+		"/",
+		config.GlobalConfig.ServerConf.ServerDomain,
+		false,
+		true,
+	)
+	c.JSON(
+		http.StatusOK,
+		gin.H{
+			"access_token": jwtToken,
+			"user_name":    record["username"],
+			"uuid":         uuid.NewV4(),
+		},
+	)
 
 }
 
