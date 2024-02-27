@@ -44,12 +44,12 @@ type JWTConfig struct {
 	SecretKey string
 }
 
-type HealthTestConfig struct {
-	TestConfig string
-}
-
 type CORSConfig struct {
 	AllowOrigins []string
+}
+
+type HealthTestConfig struct {
+	TestConfig string
 }
 
 type Config struct {
@@ -57,8 +57,8 @@ type Config struct {
 	MySQLConf  MySQLConfig
 	ServerConf ServerConfig
 	JWTConf    JWTConfig
-	HealthConf HealthTestConfig
 	CORSConf   CORSConfig
+	HealthConf HealthTestConfig
 }
 
 // global config objects

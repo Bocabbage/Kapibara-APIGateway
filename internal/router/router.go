@@ -4,6 +4,7 @@ import (
 	"kapibara-apigateway/internal/auth"
 	"kapibara-apigateway/internal/logger"
 	"kapibara-apigateway/internal/middlewares"
+	"kapibara-apigateway/internal/mikanani"
 	"kapibara-apigateway/internal/utils"
 
 	"github.com/gin-contrib/cors"
@@ -26,6 +27,14 @@ func init() {
 	{
 		authRouter.POST("/login", auth.AuthLogin)
 		authRouter.POST("/register", auth.AuthRegister)
+	}
+
+	mikananiCrudRouter := ServerEngine.Group("/mikanani/v1")
+	mikananiCrudRouter.Use(middlewares.TokenValidationMid())
+	{
+		mikananiCrudRouter.GET("/query", mikanani.QueryAnimeConfig)
+		mikananiCrudRouter.PUT("/update", mikanani.UpdateAnimeConfig)
+		mikananiCrudRouter.PUT("/delete", mikanani.DelAnimeConfig)
 	}
 
 	testRouter := ServerEngine.Group("/test/v1")
