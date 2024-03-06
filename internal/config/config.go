@@ -48,17 +48,22 @@ type CORSConfig struct {
 	AllowOrigins []string
 }
 
+type MikananiConfig struct {
+	GRpcServerAddr string
+}
+
 type HealthTestConfig struct {
 	TestConfig string
 }
 
 type Config struct {
-	LogConf    LogConfig
-	MySQLConf  MySQLConfig
-	ServerConf ServerConfig
-	JWTConf    JWTConfig
-	CORSConf   CORSConfig
-	HealthConf HealthTestConfig
+	LogConf      LogConfig
+	MySQLConf    MySQLConfig
+	ServerConf   ServerConfig
+	JWTConf      JWTConfig
+	CORSConf     CORSConfig
+	MikananiConf MikananiConfig
+	HealthConf   HealthTestConfig
 }
 
 // global config objects
@@ -102,6 +107,9 @@ func loadGlobalConfig() {
 	}
 	GlobalConfig.CORSConf = CORSConfig{
 		AllowOrigins: strings.Split(os.Getenv("ALLOW_ORIGINS"), ","),
+	}
+	GlobalConfig.MikananiConf = MikananiConfig{
+		GRpcServerAddr: os.Getenv("MIKANANI_GRPC_ADDR"),
 	}
 }
 
