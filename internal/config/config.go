@@ -34,7 +34,6 @@ type ServerConfig struct {
 	ServerAddr   string
 	ServerPort   string
 	ServerDomain string
-	IsTLS        bool
 	CertFile     string
 	KeyFile      string
 }
@@ -71,7 +70,6 @@ var GlobalConfig = new(Config)
 
 func loadGlobalConfig() {
 
-	isTLS, _ := strconv.ParseBool(os.Getenv("IS_TLS"))
 	mysqlSalt, _ := strconv.ParseInt(os.Getenv("MYSQL_SALT"), 16, 64)
 	jwtExpired, _ := strconv.ParseInt(os.Getenv("JWT_EXPIRED"), 10, 64)
 
@@ -94,7 +92,6 @@ func loadGlobalConfig() {
 		ServerAddr:   os.Getenv("SERVER_ADDR"),
 		ServerPort:   os.Getenv("SERVER_PORT"),
 		ServerDomain: os.Getenv("SERVER_DOMAIN"),
-		IsTLS:        isTLS,
 		CertFile:     os.Getenv("CERT_FILE"),
 		KeyFile:      os.Getenv("KEY_FILE"),
 	}

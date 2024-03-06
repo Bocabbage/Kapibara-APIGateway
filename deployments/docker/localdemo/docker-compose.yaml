@@ -7,7 +7,7 @@ services:
       dockerfile: ./deployments/docker/localdemo/Dockerfile
     restart: on-failure
     ports:
-      - "5678:80"
+      - "443:443"
     depends_on:
       - "mysqldb"
     networks:
