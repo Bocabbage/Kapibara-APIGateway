@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kapibara-apigateway
+  namespace: web-general
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: kapibara-apigateway
+      feature: worker
+  template:
+    metadata:
+      labels:
+        app: kapibara-apigateway
+        feature: worker
+    spec:
+      containers:
+      - name: kapibara-apigateway
+        image: <DOCKER_HUB_REPO>/<KapibaraApiGatewayImage>
+        imagePullPolicy: Never
+        envFrom:
+        - secretRef:
+            name: kapibara-apigateway-config
+        command: ["./kapibara-apigateway_exe"]
+        resources:
+          limits:
+            memory: "128Mi"
+            cpu: "50m"
