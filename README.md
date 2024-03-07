@@ -15,11 +15,11 @@ bash build/localdemo.sh
 #### gRPC protos
 ```shell
 cd protobufs && \
-protoc --go_out=../internal/grpc_utils \
+protoc --go_out=../internal/mikanani_grpc_utils \
 --go_opt=paths=source_relative \
---go-grpc_out=../internal/grpc_utils \
+--go-grpc_out=../internal/mikanani_grpc_utils \
 --go-grpc_opt=paths=source_relative \
-protobufs/mongodb_crud.proto
+mikanani_grpc.proto
 ```
 
 ## Todo

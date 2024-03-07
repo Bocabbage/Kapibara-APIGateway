@@ -18,11 +18,11 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-var opts []grpc.DialOption
+var some_opts []grpc.DialOption
 
 func init() {
 	// TODO: Add tls
-	opts = append(opts, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	some_opts = append(some_opts, grpc.WithTransportCredentials(insecure.NewCredentials()))
 }
 
 func UpdateAnimeConfig(c *gin.Context) {
@@ -31,7 +31,7 @@ func UpdateAnimeConfig(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid params"})
 	}
 
-	grpcConn, err := grpc.Dial(config.GlobalConfig.MikananiConf.GRpcServerAddr, opts...)
+	grpcConn, err := grpc.Dial(config.GlobalConfig.MikananiConf.GRpcServerAddr, some_opts...)
 	if err != nil {
 		c.JSON(
 			http.StatusInternalServerError,
@@ -90,7 +90,7 @@ func DelAnimeConfig(c *gin.Context) {
 		return
 	}
 
-	grpcConn, err := grpc.Dial(config.GlobalConfig.MikananiConf.GRpcServerAddr, opts...)
+	grpcConn, err := grpc.Dial(config.GlobalConfig.MikananiConf.GRpcServerAddr, some_opts...)
 	if err != nil {
 		c.JSON(
 			http.StatusInternalServerError,
@@ -147,7 +147,7 @@ func QueryAnimeConfig(c *gin.Context) {
 	}
 	activeType := int32(tmp)
 
-	grpcConn, err := grpc.Dial(config.GlobalConfig.MikananiConf.GRpcServerAddr, opts...)
+	grpcConn, err := grpc.Dial(config.GlobalConfig.MikananiConf.GRpcServerAddr, some_opts...)
 	if err != nil {
 		c.JSON(
 			http.StatusInternalServerError,

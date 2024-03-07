@@ -38,6 +38,22 @@ func init() {
 		mikananiCrudRouter.DELETE("/delete", mikanani.DelAnimeConfig)
 	}
 
+	mikananiServiceRouter := ServerEngine.Group("/mikanani/v2")
+	// TODO: reopen valid-middleware
+	// mikananiServiceRouter.Use(middlewares.TokenValidationMid())
+	{
+		animeServiceRouter := mikananiServiceRouter.Group("/anime")
+		{
+			animeServiceRouter.GET("/list-meta", mikanani.ListAnimeMeta)
+			animeServiceRouter.GET("/doc", mikanani.GetAnimeDoc)
+			animeServiceRouter.PUT("/update-doc", mikanani.UpdateAnimeDoc)
+			animeServiceRouter.PUT("/update-meta", mikanani.UpdateAnimeMeta)
+			animeServiceRouter.POST("/insert", mikanani.InsertAnimeItem)
+			animeServiceRouter.DELETE("/delete", mikanani.DeleteAnimeItem)
+			animeServiceRouter.POST("/dispatch-download", mikanani.DispatchDownload)
+		}
+	}
+
 	testRouter := ServerEngine.Group("/test/v1")
 	testRouter.Use(middlewares.TokenValidationMid())
 	{
