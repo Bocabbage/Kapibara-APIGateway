@@ -13,6 +13,7 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/grpc/status"
+	"google.golang.org/protobuf/types/known/emptypb"
 )
 
 var opts []grpc.DialOption
@@ -133,7 +134,7 @@ func GetAnimeDoc(c *gin.Context) {
 		// TODO: enrich error-handling
 		c.JSON(
 			http.StatusBadRequest,
-			gin.H{"error": "Something happened at querying anime informations."},
+			gin.H{"error": "Something happened at querying anime doc informations."},
 		)
 		return
 	}
@@ -166,7 +167,7 @@ func UpdateAnimeDoc(c *gin.Context) {
 	ctx, cancel := context.WithTimeout(context.Background(), config.GRPC_CLI_TIMEOUT)
 	defer cancel()
 
-	reply, err := cli.UpdateAnimeDoc(ctx, &mikansvc.UpdateAnimeDocRequest{
+	_, err = cli.UpdateAnimeDoc(ctx, &mikansvc.UpdateAnimeDocRequest{
 		UpdateAnimeDoc: &mikansvc.AnimeDoc{
 			Uid:    params.Uid,
 			RssUrl: params.RssUrl,
@@ -188,7 +189,7 @@ func UpdateAnimeDoc(c *gin.Context) {
 		// TODO: enrich error-handling
 		c.JSON(
 			http.StatusBadRequest,
-			gin.H{"error": "Something happened at querying anime informations."},
+			gin.H{"error": "Something happened at updating anime doc informations."},
 		)
 		return
 	}
@@ -205,6 +206,52 @@ func UpdateAnimeMeta(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid params"})
 		return
 	}
+
+	grpcConn, err := grpc.Dial(config.GlobalConfig.MikananiConf.GRpcServerAddr, opts...)
+	if err != nil {
+		c.JSON(
+			http.StatusInternalServerError,
+			gin.H{"error": "backend service access failed."},
+		)
+		return
+	}
+	defer grpcConn.Close()
+	cli := mikansvc.NewMikananiServiceClient(grpcConn)
+	ctx, cancel := context.WithTimeout(context.Background(), config.GRPC_CLI_TIMEOUT)
+	defer cancel()
+
+	_, err = cli.UpdateAnimeMeta(ctx, &mikansvc.UpdateAnimeMetaRequest{
+		UpdateAnimeMeta: &mikansvc.AnimeMeta{
+			Uid:            params.Uid,
+			Name:           params.Name,
+			DownloadBitmap: params.DownloadBitmap,
+			IsActive:       params.IsActive,
+			Tags:           params.Tags,
+		},
+	})
+
+	if err != nil {
+		logger.Error(fmt.Sprintf("[UpdateAnimeMeta][Error]: %v", err))
+		if status.Code(err) == codes.DeadlineExceeded {
+			c.JSON(
+				http.StatusGatewayTimeout,
+				gin.H{"error": "The server is busy."},
+			)
+			return
+		}
+
+		// TODO: enrich error-handling
+		c.JSON(
+			http.StatusBadRequest,
+			gin.H{"error": "Something happened at updating anime meta informations."},
+		)
+		return
+	}
+
+	c.JSON(
+		http.StatusOK,
+		gin.H{},
+	)
 }
 
 func InsertAnimeItem(c *gin.Context) {
@@ -213,6 +260,59 @@ func InsertAnimeItem(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid params"})
 		return
 	}
+
+	grpcConn, err := grpc.Dial(config.GlobalConfig.MikananiConf.GRpcServerAddr, opts...)
+	if err != nil {
+		c.JSON(
+			http.StatusInternalServerError,
+			gin.H{"error": "backend service access failed."},
+		)
+		return
+	}
+	defer grpcConn.Close()
+	cli := mikansvc.NewMikananiServiceClient(grpcConn)
+	ctx, cancel := context.WithTimeout(context.Background(), config.GRPC_CLI_TIMEOUT)
+	defer cancel()
+
+	_, err = cli.InsertAnimeItem(ctx, &mikansvc.InsertAnimeItemRequest{
+		InsertAnimeMeta: &mikansvc.AnimeMeta{
+			Uid:            -1,
+			Name:           params.Name,
+			DownloadBitmap: 0,
+			IsActive:       true,
+			Tags:           params.Tags,
+		},
+		InsertAnimeDoc: &mikansvc.AnimeDoc{
+			Uid:    -1,
+			RssUrl: params.RssUrl,
+			Rule:   params.Rule,
+			Regex:  params.Regex,
+		},
+	})
+
+	if err != nil {
+		logger.Error(fmt.Sprintf("[InsertAnimeItem][Error]: %v", err))
+		if status.Code(err) == codes.DeadlineExceeded {
+			c.JSON(
+				http.StatusGatewayTimeout,
+				gin.H{"error": "The server is busy."},
+			)
+			return
+		}
+
+		// TODO: enrich error-handling
+		c.JSON(
+			http.StatusBadRequest,
+			gin.H{"error": "Something happened at inserting anime informations."},
+		)
+		return
+	}
+
+	c.JSON(
+		http.StatusOK,
+		gin.H{},
+	)
+
 }
 
 func DeleteAnimeItem(c *gin.Context) {
@@ -221,8 +321,81 @@ func DeleteAnimeItem(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid params"})
 		return
 	}
+
+	grpcConn, err := grpc.Dial(config.GlobalConfig.MikananiConf.GRpcServerAddr, opts...)
+	if err != nil {
+		c.JSON(
+			http.StatusInternalServerError,
+			gin.H{"error": "backend service access failed."},
+		)
+		return
+	}
+	defer grpcConn.Close()
+	cli := mikansvc.NewMikananiServiceClient(grpcConn)
+	ctx, cancel := context.WithTimeout(context.Background(), config.GRPC_CLI_TIMEOUT)
+	defer cancel()
+
+	_, err = cli.DeleteAnimeItem(ctx, &mikansvc.DeleteAnimeItemRequest{Uid: params.Uid})
+
+	if err != nil {
+		logger.Error(fmt.Sprintf("[DeleteAnimeItem][Error]: %v", err))
+		if status.Code(err) == codes.DeadlineExceeded {
+			c.JSON(
+				http.StatusGatewayTimeout,
+				gin.H{"error": "The server is busy."},
+			)
+			return
+		}
+
+		// TODO: enrich error-handling
+		c.JSON(
+			http.StatusBadRequest,
+			gin.H{"error": "Something happened at deleting anime informations."},
+		)
+		return
+	}
+
+	c.JSON(
+		http.StatusOK,
+		gin.H{},
+	)
 }
 
 func DispatchDownload(c *gin.Context) {
+	grpcConn, err := grpc.Dial(config.GlobalConfig.MikananiConf.GRpcServerAddr, opts...)
+	if err != nil {
+		c.JSON(
+			http.StatusInternalServerError,
+			gin.H{"error": "backend service access failed."},
+		)
+		return
+	}
+	defer grpcConn.Close()
+	cli := mikansvc.NewMikananiServiceClient(grpcConn)
+	ctx, cancel := context.WithTimeout(context.Background(), config.GRPC_CLI_TIMEOUT)
+	defer cancel()
 
+	_, err = cli.DispatchDownloadTask(ctx, &emptypb.Empty{})
+	if err != nil {
+		logger.Error(fmt.Sprintf("[DispatchDownload][Error]: %v", err))
+		if status.Code(err) == codes.DeadlineExceeded {
+			c.JSON(
+				http.StatusGatewayTimeout,
+				gin.H{"error": "The server is busy."},
+			)
+			return
+		}
+
+		// TODO: enrich error-handling
+		c.JSON(
+			http.StatusBadRequest,
+			gin.H{"error": "Something happened at dispatching download task."},
+		)
+		return
+	}
+
+	c.JSON(
+		http.StatusOK,
+		gin.H{},
+	)
 }
