@@ -37,6 +37,7 @@ func init() {
 func ListAnimeMeta(c *gin.Context) {
 	var params ListAnimeMetaFormat
 	if c.ShouldBind(&params) != nil {
+		logger.Debug(fmt.Sprintf("query params: %v\n", params))
 		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid params"})
 		return
 	}
@@ -71,6 +72,7 @@ func ListAnimeMeta(c *gin.Context) {
 		}
 
 		// TODO: enrich error-handling
+		logger.Debug(fmt.Sprintf("query grpc error, params: %v\n", params))
 		c.JSON(
 			http.StatusBadRequest,
 			gin.H{"error": "Something happened at querying anime informations."},
