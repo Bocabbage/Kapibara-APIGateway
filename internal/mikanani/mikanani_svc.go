@@ -36,7 +36,7 @@ func init() {
 // @Router /mikanani/v2/anime/list-meta [get]
 func ListAnimeMeta(c *gin.Context) {
 	var params ListAnimeMetaFormat
-	if c.ShouldBind(&params) != nil {
+	if c.ShouldBindQuery(&params) != nil {
 		logger.Debug(fmt.Sprintf("query params: %v\n", params))
 		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid params"})
 		return
