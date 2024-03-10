@@ -106,7 +106,7 @@ func loadGlobalConfig() {
 		AllowOrigins: strings.Split(os.Getenv("ALLOW_ORIGINS"), ","),
 	}
 	GlobalConfig.MikananiConf = MikananiConfig{
-		GRpcServerAddr: os.Getenv("MIKANANI_SVC_SERVICE_HOST") + ":" + os.Getenv("MIKANANI_SVC_SERVICE_PORT"),
+		GRpcServerAddr: os.Getenv("MIKANAN_GRPC_HOST") + ":" + os.Getenv("MIKANAN_GRPC_PORT"),
 	}
 }
 
