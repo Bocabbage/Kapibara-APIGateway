@@ -11,17 +11,17 @@ type UpdateAnimeFormat struct {
 // ----- v2
 type AnimeDocFormat struct {
 	Uid    int64  `json:"uid"`
-	RssUrl string `json:"rss_url"`
-	Rule   string `json:"rule"`
-	Regex  string `json:"regex"`
+	RssUrl string `json:"rss_url,omitempty"`
+	Rule   string `json:"rule,omitempty"`
+	Regex  string `json:"regex,omitempty"`
 }
 
 type AnimeMetaFormat struct {
 	Uid            int64    `json:"uid"`
-	Name           string   `json:"name"`
-	DownloadBitmap int64    `json:"download_bitmap"`
-	IsActive       bool     `json:"is_active"`
-	Tags           []string `json:"tags"`
+	Name           string   `json:"name,omitempty"`
+	DownloadBitmap int64    `json:"download_bitmap,omitempty"`
+	IsActive       bool     `json:"is_active,omitempty"`
+	Tags           []string `json:"tags,omitempty"`
 }
 
 type ListAnimeMetaFormat struct {
@@ -46,7 +46,7 @@ type UpdateAnimeMetaFormat struct {
 
 type InsertAnimeItemFormat struct {
 	Name   string   `json:"name" binding:"required"`
-	Tags   []string `json:"tags"`
+	Tags   []string `json:"tags,omitempty"`
 	RssUrl string   `json:"rss_url" binding:"required"`
 	Rule   string   `json:"rule" binding:"required"`
 	Regex  string   `json:"regex" binding:"required"`
