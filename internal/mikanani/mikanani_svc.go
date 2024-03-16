@@ -180,6 +180,7 @@ func UpdateAnimeDoc(c *gin.Context) {
 
 	if err != nil {
 		logger.Error(fmt.Sprintf("[UpdateAnimeDoc][Error]: %v", err))
+		logger.Debug(fmt.Sprintf("[UpdateAnimeDoc][Error]params: %v", params))
 		if status.Code(err) == codes.DeadlineExceeded {
 			c.JSON(
 				http.StatusGatewayTimeout,
@@ -234,6 +235,7 @@ func UpdateAnimeMeta(c *gin.Context) {
 
 	if err != nil {
 		logger.Error(fmt.Sprintf("[UpdateAnimeMeta][Error]: %v", err))
+		logger.Debug(fmt.Sprintf("[UpdateAnimeMeta][Error]params: %v", params))
 		if status.Code(err) == codes.DeadlineExceeded {
 			c.JSON(
 				http.StatusGatewayTimeout,
