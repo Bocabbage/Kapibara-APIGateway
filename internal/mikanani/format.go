@@ -5,7 +5,7 @@ type UpdateAnimeFormat struct {
 	RssUrl      string `json:"rss_url" binding:"required"`
 	RuleVersion string `json:"rule_version" binding:"required"`
 	RuleRegex   string `json:"rule_regex" binding:"required"`
-	IsActive    bool   `json:"is_active" binding:"required"`
+	IsActive    int32  `json:"is_active" binding:"required"`
 }
 
 // ----- v2
@@ -20,7 +20,7 @@ type AnimeMetaFormat struct {
 	Uid            int64    `json:"uid"`
 	Name           string   `json:"name,omitempty"`
 	DownloadBitmap int64    `json:"download_bitmap,omitempty"`
-	IsActive       bool     `json:"is_active,omitempty"`
+	IsActive       int32    `json:"is_active,omitempty"`
 	Tags           []string `json:"tags,omitempty"`
 }
 
@@ -45,11 +45,12 @@ type UpdateAnimeMetaFormat struct {
 }
 
 type InsertAnimeItemFormat struct {
-	Name   string   `json:"name" binding:"required"`
-	Tags   []string `json:"tags,omitempty"`
-	RssUrl string   `json:"rss_url" binding:"required"`
-	Rule   string   `json:"rule" binding:"required"`
-	Regex  string   `json:"regex" binding:"required"`
+	Name     string   `json:"name" binding:"required"`
+	Tags     []string `json:"tags,omitempty"`
+	RssUrl   string   `json:"rss_url" binding:"required"`
+	Rule     string   `json:"rule" binding:"required"`
+	Regex    string   `json:"regex" binding:"required"`
+	IsActive int32    `json:"is_active" binding:"required"`
 }
 
 type DeleteAnimeItemFormat struct {

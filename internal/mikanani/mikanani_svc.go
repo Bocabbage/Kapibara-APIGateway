@@ -283,7 +283,7 @@ func InsertAnimeItem(c *gin.Context) {
 			Uid:            -1,
 			Name:           params.Name,
 			DownloadBitmap: 0,
-			IsActive:       true,
+			IsActive:       params.IsActive,
 			Tags:           params.Tags,
 		},
 		InsertAnimeDoc: &mikansvc.AnimeDoc{
