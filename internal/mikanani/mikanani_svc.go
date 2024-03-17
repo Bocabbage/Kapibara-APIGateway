@@ -36,7 +36,8 @@ func init() {
 // @Router /mikanani/v2/anime/list-meta [get]
 func ListAnimeMeta(c *gin.Context) {
 	var params ListAnimeMetaFormat
-	if c.ShouldBind(&params) != nil {
+	if c.ShouldBindQuery(&params) != nil {
+		logger.Debug(fmt.Sprintf("query params: %v\n", params))
 		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid params"})
 		return
 	}
@@ -71,6 +72,7 @@ func ListAnimeMeta(c *gin.Context) {
 		}
 
 		// TODO: enrich error-handling
+		logger.Debug(fmt.Sprintf("query grpc error, params: %v\n", params))
 		c.JSON(
 			http.StatusBadRequest,
 			gin.H{"error": "Something happened at querying anime informations."},
@@ -178,6 +180,7 @@ func UpdateAnimeDoc(c *gin.Context) {
 
 	if err != nil {
 		logger.Error(fmt.Sprintf("[UpdateAnimeDoc][Error]: %v", err))
+		logger.Debug(fmt.Sprintf("[UpdateAnimeDoc][Error]params: %v", params))
 		if status.Code(err) == codes.DeadlineExceeded {
 			c.JSON(
 				http.StatusGatewayTimeout,
@@ -232,6 +235,7 @@ func UpdateAnimeMeta(c *gin.Context) {
 
 	if err != nil {
 		logger.Error(fmt.Sprintf("[UpdateAnimeMeta][Error]: %v", err))
+		logger.Debug(fmt.Sprintf("[UpdateAnimeMeta][Error]params: %v", params))
 		if status.Code(err) == codes.DeadlineExceeded {
 			c.JSON(
 				http.StatusGatewayTimeout,
@@ -279,7 +283,7 @@ func InsertAnimeItem(c *gin.Context) {
 			Uid:            -1,
 			Name:           params.Name,
 			DownloadBitmap: 0,
-			IsActive:       true,
+			IsActive:       params.IsActive,
 			Tags:           params.Tags,
 		},
 		InsertAnimeDoc: &mikansvc.AnimeDoc{

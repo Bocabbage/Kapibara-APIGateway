@@ -9,6 +9,7 @@ import (
 	"kapibara-apigateway/internal/logger"
 	mysqlsdk "kapibara-apigateway/internal/mysql"
 	"net/http"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	uuid "github.com/satori/go.uuid"
@@ -28,6 +29,7 @@ func AuthLogin(c *gin.Context) {
 	}
 
 	// get related-account
+	getRecordTimeStart := time.Now()
 	record, err := mysqlsdk.GetRecordByAccount(account)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
@@ -44,8 +46,10 @@ func AuthLogin(c *gin.Context) {
 		}
 		return
 	}
+	logger.Debug(fmt.Sprintf("getrecord from mysql: cost %.3f s.", time.Since(getRecordTimeStart).Seconds()))
 
 	// check the password
+	bCryptTimeStart := time.Now()
 	storedPwdHash := record["pwdHash"]
 	compResult := cryptoUtils.BCryptHashCompare(storedPwdHash, pwd)
 	if !compResult {
@@ -55,9 +59,11 @@ func AuthLogin(c *gin.Context) {
 		)
 		return
 	}
+	logger.Debug(fmt.Sprintf("bcrypt: cost %.3f s.", time.Since(bCryptTimeStart).Seconds()))
 
 	// generate jwt
 	// [todo] enhancement: decoupling jwt-format
+	genJwtTimeStart := time.Now()
 	record["account"] = account
 	jwtToken, err := cryptoUtils.GenerateJWT(record)
 	if err != nil {
@@ -68,7 +74,7 @@ func AuthLogin(c *gin.Context) {
 		)
 		return
 	}
-
+	logger.Debug(fmt.Sprintf("gen jwt: cost %.3f s.", time.Since(genJwtTimeStart).Seconds()))
 	logger.Debug(fmt.Sprintf("Login success for %s.", account))
 	// [todo]
 	// 1. set secure=true when https enabled

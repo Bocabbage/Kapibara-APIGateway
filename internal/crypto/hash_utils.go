@@ -18,7 +18,7 @@ func Sha256Hash(input string) string {
 }
 
 func BCryptHash(input string) (string, error) {
-	bytes, err := bcrypt.GenerateFromPassword([]byte(input), 12)
+	bytes, err := bcrypt.GenerateFromPassword([]byte(input), 10)
 	return string(bytes), err
 }
 

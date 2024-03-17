@@ -19,11 +19,18 @@ spec:
       - name: kapibara-apigateway
         image: <DOCKER_HUB_REPO>/<KapibaraApiGatewayImage>
         imagePullPolicy: Never
+        volumeMounts:
+        - name: tls-secret
+          mountPath: "/etc/tls"
         envFrom:
         - secretRef:
             name: kapibara-apigateway-config
-        command: ["./kapibara-apigateway_exe"]
+        command: ["./kapibara-apigateway_exe", "-tls"]
         resources:
           limits:
-            memory: "128Mi"
-            cpu: "50m"
+            memory: "512Mi"
+            cpu: "200m"
+      volumes:
+      - name: tls-secret
+        secret:
+          secretName: kapibara-tls
