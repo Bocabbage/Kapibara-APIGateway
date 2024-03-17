@@ -85,7 +85,7 @@ func AuthLogin(c *gin.Context) {
 		int(config.GlobalConfig.JWTConf.Expired),
 		"/",
 		config.GlobalConfig.ServerConf.ServerDomain,
-		false,
+		true,
 		true,
 	)
 	c.JSON(
