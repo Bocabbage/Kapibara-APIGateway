@@ -30,18 +30,8 @@ func init() {
 		authRouter.POST("/register", auth.AuthRegister)
 	}
 
-	mikananiCrudRouter := ServerEngine.Group("/mikanani/v1")
-	// TODO: reopen valid-middleware
-	// mikananiCrudRouter.Use(middlewares.TokenValidationMid())
-	{
-		mikananiCrudRouter.GET("/query", mikanani.QueryAnimeConfig)
-		mikananiCrudRouter.PUT("/update", mikanani.UpdateAnimeConfig)
-		mikananiCrudRouter.DELETE("/delete", mikanani.DelAnimeConfig)
-	}
-
 	mikananiServiceRouter := ServerEngine.Group("/mikanani/v2")
-	// TODO: reopen valid-middleware
-	// mikananiServiceRouter.Use(middlewares.TokenValidationMid())
+	mikananiServiceRouter.Use(middlewares.TokenValidationMid())
 	{
 		animeServiceRouter := mikananiServiceRouter.Group("/anime")
 		{
