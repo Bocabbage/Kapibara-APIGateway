@@ -22,6 +22,12 @@ type MySQLConfig struct {
 	Salt    int64
 }
 
+type RedisConfig struct {
+	Addr     string
+	Password string
+	DB       int
+}
+
 type LogConfig struct {
 	Level       string
 	ServiceName string
@@ -58,6 +64,7 @@ type HealthTestConfig struct {
 type Config struct {
 	LogConf      LogConfig
 	MySQLConf    MySQLConfig
+	RedisConf    RedisConfig
 	ServerConf   ServerConfig
 	JWTConf      JWTConfig
 	CORSConf     CORSConfig
@@ -81,6 +88,11 @@ func loadGlobalConfig() {
 		DBName:  os.Getenv("MYSQL_DATABASE"),
 		StrSalt: os.Getenv("MYSQL_STRSALT"),
 		Salt:    mysqlSalt,
+	}
+	GlobalConfig.RedisConf = RedisConfig{
+		Addr:     os.Getenv("REDIS_ADDR"),
+		Password: os.Getenv("REDIS_PASSWORD"),
+		DB:       0,
 	}
 	GlobalConfig.LogConf = LogConfig{
 		Level: os.Getenv("LOG_LEVEL"),

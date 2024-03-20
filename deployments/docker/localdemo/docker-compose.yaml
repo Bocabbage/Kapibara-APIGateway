@@ -7,7 +7,7 @@ services:
       dockerfile: ./deployments/docker/localdemo/Dockerfile
     restart: on-failure
     ports:
-      - "5678:80"
+      - "5678:443"
     depends_on:
       - "mysqldb"
     networks:
@@ -29,6 +29,16 @@ services:
       - "kapibara-testnet"
     volumes:
       - "./init.sql:/docker-entrypoint-initdb.d/init.sql"
+  rediscache:
+    image: "redis:latest"
+    container_name: "cache-redis0"
+    ports:
+      - "6379:6379"
+    environment:
+      NEW_REDIS_PASSWORD: "test_kapibara_pwd"
+    networks:
+      - "kapibara-testnet"
+    command: ["redis-server", "--requirepass", "${NEW_REDIS_PASSWORD}"]
 
 networks:
   kapibara-testnet:
