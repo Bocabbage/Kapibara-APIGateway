@@ -16,12 +16,14 @@ var ServerEngine *gin.Engine
 
 func init() {
 	ServerEngine = gin.Default()
+	ServerEngine.SetTrustedProxies(nil)
 	ServerEngine.Use(cors.New(cors.Config{
 		// [todo] restrict the cors
 		// AllowAllOrigins:  true,
 		AllowOrigins:     config.GlobalConfig.CORSConf.AllowOrigins, // [todo] dev-mode
 		AllowCredentials: true,
 		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE"},
+		AllowHeaders:     []string{"Content-Type"},
 	}))
 
 	authRouter := ServerEngine.Group("/auth/v1")
