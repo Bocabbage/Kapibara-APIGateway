@@ -36,12 +36,12 @@ type GetAnimeDocFormat struct {
 
 type UpdateAnimeDocFormat struct {
 	AnimeDocFormat
-	Uid int64 `json:"uid" binding:"required"`
+	Uid string `json:"uid" binding:"required"`
 }
 
 type UpdateAnimeMetaFormat struct {
 	AnimeMetaFormat
-	Uid int64 `json:"uid" binding:"required"`
+	Uid string `json:"uid" binding:"required"`
 }
 
 type InsertAnimeItemFormat struct {

@@ -7,6 +7,7 @@ import (
 	"kapibara-apigateway/internal/logger"
 	mikansvc "kapibara-apigateway/internal/mikanani_grpc_utils"
 	"net/http"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 	"google.golang.org/grpc"
@@ -169,9 +170,17 @@ func UpdateAnimeDoc(c *gin.Context) {
 	ctx, cancel := context.WithTimeout(context.Background(), config.GRPC_CLI_TIMEOUT)
 	defer cancel()
 
+	intUid, err := strconv.ParseInt(params.Uid, 10, 64)
+	if err != nil {
+		c.JSON(
+			http.StatusBadRequest,
+			gin.H{"error": "Invalid uid."},
+		)
+		return
+	}
 	_, err = cli.UpdateAnimeDoc(ctx, &mikansvc.UpdateAnimeDocRequest{
 		UpdateAnimeDoc: &mikansvc.AnimeDoc{
-			Uid:    params.Uid,
+			Uid:    intUid,
 			RssUrl: params.RssUrl,
 			Rule:   params.Rule,
 			Regex:  params.Regex,
@@ -223,9 +232,18 @@ func UpdateAnimeMeta(c *gin.Context) {
 	ctx, cancel := context.WithTimeout(context.Background(), config.GRPC_CLI_TIMEOUT)
 	defer cancel()
 
+	intUid, err := strconv.ParseInt(params.Uid, 10, 64)
+	if err != nil {
+		c.JSON(
+			http.StatusBadRequest,
+			gin.H{"error": "Invalid uid."},
+		)
+		return
+	}
+
 	_, err = cli.UpdateAnimeMeta(ctx, &mikansvc.UpdateAnimeMetaRequest{
 		UpdateAnimeMeta: &mikansvc.AnimeMeta{
-			Uid:            params.Uid,
+			Uid:            intUid,
 			Name:           params.Name,
 			DownloadBitmap: params.DownloadBitmap,
 			IsActive:       params.IsActive,
