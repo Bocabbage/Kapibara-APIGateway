@@ -48,8 +48,8 @@ jobs:
         sed -i "s|<DOCKER_HUB_REPO>|${repo}|g" ./deployments/kubernetes/dev/worker.yaml
         sed -i "s|<KapibaraApiGatewayImage>|${image}|g" ./deployments/kubernetes/dev/worker.yaml
 
-        sed -i "s|<NFS_SERVER_IP>|${nfsip}|g" ./deployments/kubernetes/mikanani/worker.yaml
-        sed -i "s|<MIKANANI_NFS_PATH>|${mikananinfspath}|g" ./deployments/kubernetes/mikanani/worker.yaml
+        sed -i "s|<NFS_SERVER_IP>|${nfsip}|g" ./deployments/kubernetes/dev/worker.yaml
+        sed -i "s|<MIKANANI_NFS_PATH>|${mikananinfspath}|g" ./deployments/kubernetes/dev/worker.yaml
 
         echo ${{ secrets.M14_SUDO_PWD }} | sudo -S kubectl apply -f ./deployments/kubernetes/dev/worker.yaml
         echo ${{ secrets.M14_SUDO_PWD }} | sudo -S kubectl apply -f ./deployments/kubernetes/dev/service.yaml
