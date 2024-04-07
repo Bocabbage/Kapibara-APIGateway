@@ -85,11 +85,21 @@ func ListAnimeMeta(c *gin.Context) {
 		return
 	}
 
+	rawMetas := reply.GetAnimeMetas()
+	formatMetas := make([]gin.H, 0)
+	for _, rawMeta := range rawMetas {
+		formatMetas = append(formatMetas, gin.H{
+			"uid":      fmt.Sprint(rawMeta.Uid),
+			"name":     rawMeta.Name,
+			"isActive": rawMeta.IsActive,
+		})
+	}
+
 	c.JSON(
 		http.StatusOK,
 		gin.H{
 			"count": reply.GetItemCount(),
-			"metas": reply.GetAnimeMetas(),
+			"metas": formatMetas,
 		},
 	)
 
@@ -336,7 +346,7 @@ func InsertAnimeItem(c *gin.Context) {
 
 	c.JSON(
 		http.StatusOK,
-		gin.H{"uid": res.Uid},
+		gin.H{"uid": fmt.Sprint(res.Uid)},
 	)
 
 }
