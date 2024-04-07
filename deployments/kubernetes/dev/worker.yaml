@@ -22,6 +22,8 @@ spec:
         volumeMounts:
         - name: tls-secret
           mountPath: "/etc/tls"
+        - name: nfs-volume
+          mountPath: /mnt/nfs
         envFrom:
         - secretRef:
             name: kapibara-apigateway-config
@@ -29,8 +31,12 @@ spec:
         resources:
           limits:
             memory: "512Mi"
-            cpu: "200m"
+            cpu: "1"
       volumes:
       - name: tls-secret
         secret:
           secretName: kapibara-tls
+      - name: nfs-volume
+        nfs:
+          server: <NFS_SERVER_IP>
+          path: <MIKANANI_NFS_PATH>

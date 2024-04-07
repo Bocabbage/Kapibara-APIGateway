@@ -25,6 +25,7 @@ func init() {
 		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE"},
 		AllowHeaders:     []string{"Content-Type"},
 	}))
+	ServerEngine.MaxMultipartMemory = 8 << 20 // 8 MiB
 
 	authRouter := ServerEngine.Group("/auth/v1")
 	{
@@ -44,6 +45,8 @@ func init() {
 			animeServiceRouter.POST("/insert", mikanani.InsertAnimeItem)
 			animeServiceRouter.DELETE("/delete", mikanani.DeleteAnimeItem)
 			animeServiceRouter.POST("/dispatch-download", mikanani.DispatchDownload)
+			animeServiceRouter.GET("/pics/:uid", mikanani.GetAnimeImage)
+			animeServiceRouter.POST("/pics/upload/:uid", mikanani.PostAnimeImage)
 		}
 	}
 

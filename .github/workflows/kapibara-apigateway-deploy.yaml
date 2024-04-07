@@ -39,12 +39,17 @@ jobs:
         image_name=`echo ${{ github.event.inputs.module }} | awk '{print tolower($1)}'`
         image="${image_name}:latest"
         repo="${{ secrets.DOCKER_HUB_USERNAME }}\/${{ secrets.DOCKER_HUB_REPO }}"
+        nfsip="${{ secrets.NFS_SERVER_IP }}"
+        mikananinfspath="${{ secrets.MIKANANI_NFS_PATH }}"
 
         case "${{ github.event.inputs.deploymode }}" in
         "dev")
         echo "Deploy dev mode..."
-        sed -i "s/<DOCKER_HUB_REPO>/${repo}/g" ./deployments/kubernetes/dev/worker.yaml
-        sed -i "s/<KapibaraApiGatewayImage>/${image}/g" ./deployments/kubernetes/dev/worker.yaml
+        sed -i "s|<DOCKER_HUB_REPO>|${repo}|g" ./deployments/kubernetes/dev/worker.yaml
+        sed -i "s|<KapibaraApiGatewayImage>|${image}|g" ./deployments/kubernetes/dev/worker.yaml
+
+        sed -i "s|<NFS_SERVER_IP>|${nfsip}|g" ./deployments/kubernetes/mikanani/worker.yaml
+        sed -i "s|<MIKANANI_NFS_PATH>|${mikananinfspath}|g" ./deployments/kubernetes/mikanani/worker.yaml
 
         echo ${{ secrets.M14_SUDO_PWD }} | sudo -S kubectl apply -f ./deployments/kubernetes/dev/worker.yaml
         echo ${{ secrets.M14_SUDO_PWD }} | sudo -S kubectl apply -f ./deployments/kubernetes/dev/service.yaml
