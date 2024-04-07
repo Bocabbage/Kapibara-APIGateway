@@ -61,6 +61,10 @@ type HealthTestConfig struct {
 	TestConfig string
 }
 
+type MountConfig struct {
+	MikananiNFSMountPath string
+}
+
 type Config struct {
 	LogConf      LogConfig
 	MySQLConf    MySQLConfig
@@ -69,6 +73,7 @@ type Config struct {
 	JWTConf      JWTConfig
 	CORSConf     CORSConfig
 	MikananiConf MikananiConfig
+	MountConf    MountConfig
 	HealthConf   HealthTestConfig
 }
 
@@ -119,6 +124,9 @@ func loadGlobalConfig() {
 	}
 	GlobalConfig.MikananiConf = MikananiConfig{
 		GRpcServerAddr: os.Getenv("MIKANAN_GRPC_HOST") + ":" + os.Getenv("MIKANAN_GRPC_PORT"),
+	}
+	GlobalConfig.MountConf = MountConfig{
+		MikananiNFSMountPath: os.Getenv("MIKANANI_NFS_MOUNT_PATH"),
 	}
 }
 

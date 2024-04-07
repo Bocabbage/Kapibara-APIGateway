@@ -27,7 +27,7 @@ type MikananiServiceClient interface {
 	GetAnimeDoc(ctx context.Context, in *GetAnimeDocRequest, opts ...grpc.CallOption) (*GetAnimeDocResponse, error)
 	UpdateAnimeDoc(ctx context.Context, in *UpdateAnimeDocRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	UpdateAnimeMeta(ctx context.Context, in *UpdateAnimeMetaRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
-	InsertAnimeItem(ctx context.Context, in *InsertAnimeItemRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	InsertAnimeItem(ctx context.Context, in *InsertAnimeItemRequest, opts ...grpc.CallOption) (*InsertAnimeItemResponse, error)
 	DeleteAnimeItem(ctx context.Context, in *DeleteAnimeItemRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	DispatchDownloadTask(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*emptypb.Empty, error)
 }
@@ -76,8 +76,8 @@ func (c *mikananiServiceClient) UpdateAnimeMeta(ctx context.Context, in *UpdateA
 	return out, nil
 }
 
-func (c *mikananiServiceClient) InsertAnimeItem(ctx context.Context, in *InsertAnimeItemRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
-	out := new(emptypb.Empty)
+func (c *mikananiServiceClient) InsertAnimeItem(ctx context.Context, in *InsertAnimeItemRequest, opts ...grpc.CallOption) (*InsertAnimeItemResponse, error) {
+	out := new(InsertAnimeItemResponse)
 	err := c.cc.Invoke(ctx, "/mikanani_grpc_utils.MikananiService/InsertAnimeItem", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -111,7 +111,7 @@ type MikananiServiceServer interface {
 	GetAnimeDoc(context.Context, *GetAnimeDocRequest) (*GetAnimeDocResponse, error)
 	UpdateAnimeDoc(context.Context, *UpdateAnimeDocRequest) (*emptypb.Empty, error)
 	UpdateAnimeMeta(context.Context, *UpdateAnimeMetaRequest) (*emptypb.Empty, error)
-	InsertAnimeItem(context.Context, *InsertAnimeItemRequest) (*emptypb.Empty, error)
+	InsertAnimeItem(context.Context, *InsertAnimeItemRequest) (*InsertAnimeItemResponse, error)
 	DeleteAnimeItem(context.Context, *DeleteAnimeItemRequest) (*emptypb.Empty, error)
 	DispatchDownloadTask(context.Context, *emptypb.Empty) (*emptypb.Empty, error)
 	mustEmbedUnimplementedMikananiServiceServer()
@@ -133,7 +133,7 @@ func (UnimplementedMikananiServiceServer) UpdateAnimeDoc(context.Context, *Updat
 func (UnimplementedMikananiServiceServer) UpdateAnimeMeta(context.Context, *UpdateAnimeMetaRequest) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UpdateAnimeMeta not implemented")
 }
-func (UnimplementedMikananiServiceServer) InsertAnimeItem(context.Context, *InsertAnimeItemRequest) (*emptypb.Empty, error) {
+func (UnimplementedMikananiServiceServer) InsertAnimeItem(context.Context, *InsertAnimeItemRequest) (*InsertAnimeItemResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method InsertAnimeItem not implemented")
 }
 func (UnimplementedMikananiServiceServer) DeleteAnimeItem(context.Context, *DeleteAnimeItemRequest) (*emptypb.Empty, error) {

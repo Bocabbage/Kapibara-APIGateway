@@ -7,7 +7,11 @@ import (
 	"kapibara-apigateway/internal/logger"
 	mikansvc "kapibara-apigateway/internal/mikanani_grpc_utils"
 	"net/http"
+	"os"
+	"path"
+	"path/filepath"
 	"strconv"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 	"google.golang.org/grpc"
@@ -81,11 +85,21 @@ func ListAnimeMeta(c *gin.Context) {
 		return
 	}
 
+	rawMetas := reply.GetAnimeMetas()
+	formatMetas := make([]gin.H, 0)
+	for _, rawMeta := range rawMetas {
+		formatMetas = append(formatMetas, gin.H{
+			"uid":      fmt.Sprint(rawMeta.Uid),
+			"name":     rawMeta.Name,
+			"isActive": rawMeta.IsActive,
+		})
+	}
+
 	c.JSON(
 		http.StatusOK,
 		gin.H{
 			"count": reply.GetItemCount(),
-			"metas": reply.GetAnimeMetas(),
+			"metas": formatMetas,
 		},
 	)
 
@@ -296,7 +310,7 @@ func InsertAnimeItem(c *gin.Context) {
 	ctx, cancel := context.WithTimeout(context.Background(), config.GRPC_CLI_TIMEOUT)
 	defer cancel()
 
-	_, err = cli.InsertAnimeItem(ctx, &mikansvc.InsertAnimeItemRequest{
+	res, err := cli.InsertAnimeItem(ctx, &mikansvc.InsertAnimeItemRequest{
 		InsertAnimeMeta: &mikansvc.AnimeMeta{
 			Uid:            -1,
 			Name:           params.Name,
@@ -332,7 +346,7 @@ func InsertAnimeItem(c *gin.Context) {
 
 	c.JSON(
 		http.StatusOK,
-		gin.H{},
+		gin.H{"uid": fmt.Sprint(res.Uid)},
 	)
 
 }
@@ -375,6 +389,14 @@ func DeleteAnimeItem(c *gin.Context) {
 			gin.H{"error": "Something happened at deleting anime informations."},
 		)
 		return
+	}
+
+	// Remove related pics if exist
+	rpath := config.GlobalConfig.MountConf.MikananiNFSMountPath
+	imagePath := filepath.Join(rpath, "/pics", fmt.Sprintf("%d.png", params.Uid))
+	if _, err = os.Stat(imagePath); err == nil {
+		os.Remove(imagePath)
+		logger.Info(fmt.Sprintf("[RemoveAnimePic][Success]: uid[%d]", params.Uid))
 	}
 
 	c.JSON(
@@ -420,4 +442,54 @@ func DispatchDownload(c *gin.Context) {
 		http.StatusOK,
 		gin.H{},
 	)
+}
+
+func GetAnimeImage(c *gin.Context) {
+	uidStr := c.Param("uid")
+	uidStr = strings.Trim(uidStr, "/")
+	rpath := config.GlobalConfig.MountConf.MikananiNFSMountPath
+	imagePath := filepath.Join(rpath, "/pics", fmt.Sprintf("%s.png", uidStr))
+	if _, err := os.Stat(imagePath); os.IsNotExist(err) {
+		c.JSON(
+			http.StatusBadRequest,
+			gin.H{"error": fmt.Sprintf("Invalid uid: %s", uidStr)},
+		)
+		return
+	}
+
+	imageData, err := os.ReadFile(imagePath)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
+		return
+	}
+
+	c.Header("Content-Type", "image/png")
+	c.String(http.StatusOK, string(imageData))
+}
+
+func PostAnimeImage(c *gin.Context) {
+	uidStr := c.Param("uid")
+	uidStr = strings.Trim(uidStr, "/")
+	rpath := config.GlobalConfig.MountConf.MikananiNFSMountPath
+	imagePath := filepath.Join(rpath, "/pics", fmt.Sprintf("%s.png", uidStr))
+
+	file, err := c.FormFile("image")
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Failed to parse multipart form"})
+		return
+	}
+	fileExt := strings.ToLower(path.Ext(file.Filename))
+	if fileExt != ".png" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Only accept png."})
+		return
+	}
+
+	err = c.SaveUploadedFile(file, imagePath)
+	if err != nil {
+		logger.Error(fmt.Sprintf("[SaveUploadedFile][FAILED]: %v", err))
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
+		return
+	}
+	logger.Info(fmt.Sprintf("[SaveUploadedFile][SUCCESS]: uid[%s]", uidStr))
+	c.JSON(http.StatusOK, gin.H{})
 }
