@@ -300,7 +300,7 @@ func InsertAnimeItem(c *gin.Context) {
 	ctx, cancel := context.WithTimeout(context.Background(), config.GRPC_CLI_TIMEOUT)
 	defer cancel()
 
-	_, err = cli.InsertAnimeItem(ctx, &mikansvc.InsertAnimeItemRequest{
+	res, err := cli.InsertAnimeItem(ctx, &mikansvc.InsertAnimeItemRequest{
 		InsertAnimeMeta: &mikansvc.AnimeMeta{
 			Uid:            -1,
 			Name:           params.Name,
@@ -336,7 +336,7 @@ func InsertAnimeItem(c *gin.Context) {
 
 	c.JSON(
 		http.StatusOK,
-		gin.H{},
+		gin.H{"uid": res.Uid},
 	)
 
 }
