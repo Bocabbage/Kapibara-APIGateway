@@ -24,6 +24,7 @@ spec:
           mountPath: "/etc/tls"
         - name: nfs-volume
           mountPath: /mnt/nfs/mikanani
+          readOnly: false
         envFrom:
         - secretRef:
             name: kapibara-apigateway-config
@@ -40,3 +41,4 @@ spec:
         nfs:
           server: <NFS_SERVER_IP>
           path: <MIKANANI_NFS_PATH>
+          readOnly: false
