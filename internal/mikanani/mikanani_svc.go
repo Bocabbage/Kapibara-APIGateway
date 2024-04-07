@@ -381,6 +381,14 @@ func DeleteAnimeItem(c *gin.Context) {
 		return
 	}
 
+	// Remove related pics if exist
+	rpath := config.GlobalConfig.MountConf.MikananiNFSMountPath
+	imagePath := filepath.Join(rpath, "/pics", fmt.Sprintf("%d.png", params.Uid))
+	if _, err = os.Stat(imagePath); err == nil {
+		os.Remove(imagePath)
+		logger.Info(fmt.Sprintf("[RemoveAnimePic][Success]: uid[%d]", params.Uid))
+	}
+
 	c.JSON(
 		http.StatusOK,
 		gin.H{},
@@ -466,6 +474,12 @@ func PostAnimeImage(c *gin.Context) {
 		return
 	}
 
-	c.SaveUploadedFile(file, imagePath)
+	err = c.SaveUploadedFile(file, imagePath)
+	if err != nil {
+		logger.Error(fmt.Sprintf("[SaveUploadedFile][FAILED]: %v", err))
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
+		return
+	}
+	logger.Info(fmt.Sprintf("[SaveUploadedFile][SUCCESS]: uid[%s]", uidStr))
 	c.JSON(http.StatusOK, gin.H{})
 }

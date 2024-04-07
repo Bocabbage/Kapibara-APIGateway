@@ -23,7 +23,7 @@ spec:
         - name: tls-secret
           mountPath: "/etc/tls"
         - name: nfs-volume
-          mountPath: /mnt/nfs
+          mountPath: /mnt/nfs/mikanani
         envFrom:
         - secretRef:
             name: kapibara-apigateway-config
