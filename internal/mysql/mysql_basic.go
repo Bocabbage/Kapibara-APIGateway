@@ -27,10 +27,10 @@ func (mh *mysqlHandler) queryRow(sqlStr string) *sql.Row {
 	return row
 }
 
-func (mh *mysqlHandler) query(sqlStr string) (*sql.Rows, error) {
-	rows, err := mh.db.Query(sqlStr)
-	return rows, err
-}
+// func (mh *mysqlHandler) query(sqlStr string) (*sql.Rows, error) {
+// 	rows, err := mh.db.Query(sqlStr)
+// 	return rows, err
+// }
 
 func (mh *mysqlHandler) execute(sqlStr string, args ...any) (sql.Result, error) {
 	insertResult, err := mh.db.Exec(sqlStr, args...)
@@ -53,6 +53,7 @@ func getMySQLHandler() *mysqlHandler {
 			logger.Fatal("Wrong happened in mysqlHandler init.")
 		}
 		singletonHandler = &mysqlHandler{cfg: cfg, db: db}
+		logger.Info("mysql-client singleton init.")
 	})
 	return singletonHandler
 }

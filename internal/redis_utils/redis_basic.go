@@ -2,6 +2,7 @@ package redis_utils
 
 import (
 	"kapibara-apigateway/internal/config"
+	"kapibara-apigateway/internal/logger"
 	"sync"
 
 	"github.com/redis/go-redis/v9"
@@ -20,6 +21,7 @@ func GetRedisClient() *redis.Client {
 		}
 		// create client
 		singletonHandler = redis.NewClient(&cfg)
+		logger.Info("redis-client singleton init.")
 	})
 	return singletonHandler
 }
