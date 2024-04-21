@@ -38,6 +38,7 @@ func init() {
 	{
 		animeServiceRouter := mikananiServiceRouter.Group("/anime")
 		{
+			animeServiceRouter.GET("/anime-count", mikanani.GetAnimeCount)
 			animeServiceRouter.GET("/list-meta", mikanani.ListAnimeMeta)
 			animeServiceRouter.GET("/doc", mikanani.GetAnimeDoc)
 			animeServiceRouter.PUT("/update-doc", mikanani.UpdateAnimeDoc)

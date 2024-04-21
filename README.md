@@ -16,6 +16,7 @@ bash build/localdemo.sh
 ```shell
 cd protobufs && \
 protoc --go_out=../internal/mikanani_grpc_utils \
+-I . -I ${PROTO_LIB}/include/ \
 --go_opt=paths=source_relative \
 --go-grpc_out=../internal/mikanani_grpc_utils \
 --go-grpc_opt=paths=source_relative \

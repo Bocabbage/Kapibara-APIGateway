@@ -28,17 +28,38 @@ func init() {
 	opts = append(opts, grpc.WithTransportCredentials(insecure.NewCredentials()))
 }
 
-// @Summary List meta data of animes
-// @Description Get anime meta data in a range
-// @Accept json
-// @Produce json
-// @Param start int true 			"startIndex"
-// @Param end int true 				"endIndex"
-// @Params status_filter int true 	"statusFilter"
-// @Success 200 {array} AnimeMeta
-// @Failure 400 {object} ClientErrorResponse
-// @Failure 500 {object} ServerErrorResponse
-// @Router /mikanani/v2/anime/list-meta [get]
+func GetAnimeCount(c *gin.Context) {
+	grpcConn, err := grpc.Dial(config.GlobalConfig.MikananiConf.GRpcServerAddr, opts...)
+	if err != nil {
+		c.JSON(
+			http.StatusInternalServerError,
+			gin.H{"error": "backend service access failed."},
+		)
+		return
+	}
+	defer grpcConn.Close()
+	cli := mikansvc.NewMikananiServiceClient(grpcConn)
+	ctx, cancel := context.WithTimeout(context.Background(), config.GRPC_CLI_TIMEOUT)
+	defer cancel()
+
+	reply, err := cli.GetAnimeCount(ctx, &emptypb.Empty{})
+	if err != nil {
+		logger.Error(fmt.Sprintf("[GetAnimeCount][Error]: %v", err))
+		if status.Code(err) == codes.DeadlineExceeded {
+			c.JSON(
+				http.StatusGatewayTimeout,
+				gin.H{"error": "The server is busy."},
+			)
+			return
+		}
+	}
+
+	c.JSON(
+		http.StatusOK,
+		gin.H{"count": strconv.FormatInt(reply.Count, 10)},
+	)
+}
+
 func ListAnimeMeta(c *gin.Context) {
 	var params ListAnimeMetaFormat
 	if c.ShouldBindQuery(&params) != nil {
@@ -92,6 +113,7 @@ func ListAnimeMeta(c *gin.Context) {
 			"uid":      fmt.Sprint(rawMeta.Uid),
 			"name":     rawMeta.Name,
 			"isActive": rawMeta.IsActive,
+			"bitmap":   strconv.FormatInt(rawMeta.DownloadBitmap, 2),
 		})
 	}
 
