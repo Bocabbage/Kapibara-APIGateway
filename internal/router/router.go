@@ -1,11 +1,13 @@
 package router
 
 import (
+	"fmt"
 	"kapibara-apigateway/internal/auth"
 	"kapibara-apigateway/internal/config"
+	kgrpc "kapibara-apigateway/internal/grpc"
 	"kapibara-apigateway/internal/logger"
 	"kapibara-apigateway/internal/middlewares"
-	"kapibara-apigateway/internal/mikanani"
+	"kapibara-apigateway/internal/service"
 	"kapibara-apigateway/internal/utils"
 
 	"github.com/gin-contrib/cors"
@@ -38,16 +40,16 @@ func init() {
 	{
 		animeServiceRouter := mikananiServiceRouter.Group("/anime")
 		{
-			animeServiceRouter.GET("/anime-count", mikanani.GetAnimeCount)
-			animeServiceRouter.GET("/list-meta", mikanani.ListAnimeMeta)
-			animeServiceRouter.GET("/doc", mikanani.GetAnimeDoc)
-			animeServiceRouter.PUT("/update-doc", mikanani.UpdateAnimeDoc)
-			animeServiceRouter.PUT("/update-meta", mikanani.UpdateAnimeMeta)
-			animeServiceRouter.POST("/insert", mikanani.InsertAnimeItem)
-			animeServiceRouter.DELETE("/delete", mikanani.DeleteAnimeItem)
-			animeServiceRouter.POST("/dispatch-download", mikanani.DispatchDownload)
-			animeServiceRouter.GET("/pics/:uid", mikanani.GetAnimeImage)
-			animeServiceRouter.POST("/pics/upload/:uid", mikanani.PostAnimeImage)
+			// Static sources APIs
+			animeServiceRouter.GET("/pics/:uid", service.GetAnimeImage)
+			animeServiceRouter.POST("/pics/upload/:uid", service.PostAnimeImage)
+
+			// Http -> gRPC
+			mikananiMux, err := kgrpc.CreateMikananiMux(config.GlobalConfig.MikananiConf.GRpcServerAddr)
+			if err != nil {
+				logger.Fatal(fmt.Sprintf("[CreateMikananiMux]Error: %v", err))
+			}
+			animeServiceRouter.Any("/*any", gin.WrapH(mikananiMux))
 		}
 	}
 

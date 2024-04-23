@@ -1,4 +1,4 @@
-package mikanani
+package service
 
 type UpdateAnimeFormat struct {
 	Name        string `json:"name" binding:"required"`
