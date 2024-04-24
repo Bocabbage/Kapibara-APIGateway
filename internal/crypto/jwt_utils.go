@@ -3,7 +3,7 @@ package cryptoutils
 import (
 	"fmt"
 	"kapibara-apigateway/internal/config"
-	"kapibara-apigateway/internal/data/mysql"
+	"kapibara-apigateway/internal/data/mysql/models"
 	kerrors "kapibara-apigateway/internal/errors"
 	"reflect"
 	"time"
@@ -18,7 +18,7 @@ type JwtToken struct {
 	Roles    int64
 }
 
-func GenerateJWT(record *mysql.Users) (string, error) {
+func GenerateJWT(record *models.User) (string, error) {
 	expTime := time.Now().Add(time.Duration(config.GlobalConfig.JWTConf.Expired) * time.Second).Unix()
 
 	token := jwt.NewWithClaims(

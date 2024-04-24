@@ -7,6 +7,7 @@ import (
 	"kapibara-apigateway/internal/config"
 	cryptoUtils "kapibara-apigateway/internal/crypto"
 	mysqlsdk "kapibara-apigateway/internal/data/mysql"
+	mysqlsdkMod "kapibara-apigateway/internal/data/mysql/models"
 	"kapibara-apigateway/internal/logger"
 	"net/http"
 	"time"
@@ -120,7 +121,7 @@ func AuthRegister(c *gin.Context) {
 		return
 	}
 
-	err = mysqlsdk.RegisterNewUser(&mysqlsdk.Users{
+	err = mysqlsdk.RegisterNewUser(&mysqlsdkMod.User{
 		Account:  account,
 		UserName: username,
 		PwdHash:  pwdHash,

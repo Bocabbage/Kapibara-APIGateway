@@ -14,7 +14,7 @@ bash build/localdemo.sh
 ```
 #### gRPC protos
 ```shell
-GTPC_GATEWAY_THIRDPARTY_PATH="/Users/zhuofan_zhang/go/pkg/mod/github.com/grpc-ecosystem/grpc-gateway@v1.16.0/third_party/googleapis/"
+# GTPC_GATEWAY_THIRDPARTY_PATH="${HOME}/go/pkg/mod/github.com/grpc-ecosystem/grpc-gateway@v1.16.0/third_party/googleapis/"
 cd protobufs/ && protoc -I ${GTPC_GATEWAY_THIRDPARTY_PATH} -I . \
   --go_out ../internal/grpc/mikanani \
   --go_opt paths=source_relative \
