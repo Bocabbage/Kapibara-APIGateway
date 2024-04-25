@@ -7,8 +7,8 @@ type User struct {
 	Account    string    `gorm:"column:account;unique;not null"`
 	UserName   string    `gorm:"column:user_name;unique;not null"`
 	PwdHash    string    `gorm:"column:pwd_hash;not null"`
-	CreateAt   time.Time `gorm:"column:create_time;not null"`
-	UpdateAt   time.Time `gorm:"column:update_time;not null"`
+	CreateAt   time.Time `gorm:"column:create_time;autoCreateTime;not null"`
+	UpdateAt   time.Time `gorm:"column:update_time;autoUpdateTime;not null"`
 	Status     int       `gorm:"column:status;default:0"`
 	RoleBitmap int64     `gorm:"column:role_bitmap;default:1"`
 }
