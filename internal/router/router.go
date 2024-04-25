@@ -42,14 +42,14 @@ func init() {
 		mikananiServiceRouter.GET("/pics/:uid", service.GetAnimeImage)
 		mikananiServiceRouter.POST("/pics/upload/:uid", service.PostAnimeImage)
 
-		animeServiceRouter := mikananiServiceRouter.Group("/anime")
+		animeServiceRouter := mikananiServiceRouter.Group("/anime/*{grpc_gateway}")
 		{
 			// Http -> gRPC
 			mikananiMux, err := kgrpc.CreateMikananiMux(config.GlobalConfig.MikananiConf.GRpcServerAddr)
 			if err != nil {
 				logger.Fatal(fmt.Sprintf("[CreateMikananiMux]Error: %v", err))
 			}
-			animeServiceRouter.Any("/*any", gin.WrapH(mikananiMux))
+			animeServiceRouter.Any("", gin.WrapH(mikananiMux))
 		}
 	}
 
