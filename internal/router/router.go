@@ -38,12 +38,12 @@ func init() {
 	mikananiServiceRouter := ServerEngine.Group("/mikanani/v2")
 	mikananiServiceRouter.Use(middlewares.TokenValidationMid())
 	{
+		// Static sources APIs
+		mikananiServiceRouter.GET("/pics/:uid", service.GetAnimeImage)
+		mikananiServiceRouter.POST("/pics/upload/:uid", service.PostAnimeImage)
+
 		animeServiceRouter := mikananiServiceRouter.Group("/anime")
 		{
-			// Static sources APIs
-			animeServiceRouter.GET("/pics/:uid", service.GetAnimeImage)
-			animeServiceRouter.POST("/pics/upload/:uid", service.PostAnimeImage)
-
 			// Http -> gRPC
 			mikananiMux, err := kgrpc.CreateMikananiMux(config.GlobalConfig.MikananiConf.GRpcServerAddr)
 			if err != nil {
