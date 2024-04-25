@@ -10,7 +10,7 @@ import (
 func GetRecordByAccount(account string) (*models.User, error) {
 	// Use redis cache
 	userCache, _ := redis.GetRecordByAccountCache(account)
-	if userCache == nil {
+	if userCache != nil {
 		return userCache, nil
 	}
 
