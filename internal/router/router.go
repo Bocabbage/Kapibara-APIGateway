@@ -29,13 +29,13 @@ func init() {
 	}))
 	ServerEngine.MaxMultipartMemory = 8 << 20 // 8 MiB
 
-	authRouter := ServerEngine.Group("/auth/v1")
+	authRouter := ServerEngine.Group("/api/v1/auth/v1")
 	{
 		authRouter.POST("/login", auth.AuthLogin)
 		authRouter.POST("/register", auth.AuthRegister)
 	}
 
-	mikananiServiceRouter := ServerEngine.Group("/mikanani/v2")
+	mikananiServiceRouter := ServerEngine.Group("/api/v1/mikanani/v2")
 	mikananiServiceRouter.Use(middlewares.TokenValidationMid())
 	{
 		// Static sources APIs
