@@ -31,6 +31,8 @@ type MikananiServiceClient interface {
 	DeleteAnimeItem(ctx context.Context, in *DeleteAnimeItemRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	DispatchDownloadTask(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	GetAnimeCount(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*GetAnimeCountResponse, error)
+	GetRecentUpdateList(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*GetRecentUpdateListResponse, error)
+	DeleteRecentUpdateById(ctx context.Context, in *DelRecentUpdateByIdRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 }
 
 type mikananiServiceClient struct {
@@ -113,6 +115,24 @@ func (c *mikananiServiceClient) GetAnimeCount(ctx context.Context, in *emptypb.E
 	return out, nil
 }
 
+func (c *mikananiServiceClient) GetRecentUpdateList(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*GetRecentUpdateListResponse, error) {
+	out := new(GetRecentUpdateListResponse)
+	err := c.cc.Invoke(ctx, "/mikanani.MikananiService/GetRecentUpdateList", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *mikananiServiceClient) DeleteRecentUpdateById(ctx context.Context, in *DelRecentUpdateByIdRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	out := new(emptypb.Empty)
+	err := c.cc.Invoke(ctx, "/mikanani.MikananiService/DeleteRecentUpdateById", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // MikananiServiceServer is the server API for MikananiService service.
 // All implementations must embed UnimplementedMikananiServiceServer
 // for forward compatibility
@@ -125,6 +145,8 @@ type MikananiServiceServer interface {
 	DeleteAnimeItem(context.Context, *DeleteAnimeItemRequest) (*emptypb.Empty, error)
 	DispatchDownloadTask(context.Context, *emptypb.Empty) (*emptypb.Empty, error)
 	GetAnimeCount(context.Context, *emptypb.Empty) (*GetAnimeCountResponse, error)
+	GetRecentUpdateList(context.Context, *emptypb.Empty) (*GetRecentUpdateListResponse, error)
+	DeleteRecentUpdateById(context.Context, *DelRecentUpdateByIdRequest) (*emptypb.Empty, error)
 	mustEmbedUnimplementedMikananiServiceServer()
 }
 
@@ -155,6 +177,12 @@ func (UnimplementedMikananiServiceServer) DispatchDownloadTask(context.Context, 
 }
 func (UnimplementedMikananiServiceServer) GetAnimeCount(context.Context, *emptypb.Empty) (*GetAnimeCountResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetAnimeCount not implemented")
+}
+func (UnimplementedMikananiServiceServer) GetRecentUpdateList(context.Context, *emptypb.Empty) (*GetRecentUpdateListResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetRecentUpdateList not implemented")
+}
+func (UnimplementedMikananiServiceServer) DeleteRecentUpdateById(context.Context, *DelRecentUpdateByIdRequest) (*emptypb.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeleteRecentUpdateById not implemented")
 }
 func (UnimplementedMikananiServiceServer) mustEmbedUnimplementedMikananiServiceServer() {}
 
@@ -313,6 +341,42 @@ func _MikananiService_GetAnimeCount_Handler(srv interface{}, ctx context.Context
 	return interceptor(ctx, in, info, handler)
 }
 
+func _MikananiService_GetRecentUpdateList_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(emptypb.Empty)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MikananiServiceServer).GetRecentUpdateList(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/mikanani.MikananiService/GetRecentUpdateList",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MikananiServiceServer).GetRecentUpdateList(ctx, req.(*emptypb.Empty))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _MikananiService_DeleteRecentUpdateById_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DelRecentUpdateByIdRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MikananiServiceServer).DeleteRecentUpdateById(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/mikanani.MikananiService/DeleteRecentUpdateById",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MikananiServiceServer).DeleteRecentUpdateById(ctx, req.(*DelRecentUpdateByIdRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // MikananiService_ServiceDesc is the grpc.ServiceDesc for MikananiService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -351,6 +415,14 @@ var MikananiService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetAnimeCount",
 			Handler:    _MikananiService_GetAnimeCount_Handler,
+		},
+		{
+			MethodName: "GetRecentUpdateList",
+			Handler:    _MikananiService_GetRecentUpdateList_Handler,
+		},
+		{
+			MethodName: "DeleteRecentUpdateById",
+			Handler:    _MikananiService_DeleteRecentUpdateById_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

@@ -26,9 +26,9 @@ cd protobufs/ && protoc -I ${GTPC_GATEWAY_THIRDPARTY_PATH} -I . \
 ```
 
 ## Todo
-- [ ] Use `grpc-gateway` to replace hard-code http->grpc (mikanani)
-- [ ] Use `GORM` to replace direct mysql access
-- [ ] Extract code for Redis cache
+- [x] Use `grpc-gateway` to replace hard-code http->grpc (mikanani)
+- [x] Use `GORM` to replace direct mysql access
+- [x] Extract code for Redis cache
 - [ ] Timeout setting
 - [ ] Traffic management
 - [ ] Params Validator

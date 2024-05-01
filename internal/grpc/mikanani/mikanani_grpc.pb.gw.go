@@ -254,6 +254,10 @@ func request_MikananiService_DispatchDownloadTask_0(ctx context.Context, marshal
 	var protoReq emptypb.Empty
 	var metadata runtime.ServerMetadata
 
+	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil && err != io.EOF {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+	}
+
 	msg, err := client.DispatchDownloadTask(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
 	return msg, metadata, err
 
@@ -262,6 +266,10 @@ func request_MikananiService_DispatchDownloadTask_0(ctx context.Context, marshal
 func local_request_MikananiService_DispatchDownloadTask_0(ctx context.Context, marshaler runtime.Marshaler, server MikananiServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var protoReq emptypb.Empty
 	var metadata runtime.ServerMetadata
+
+	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil && err != io.EOF {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+	}
 
 	msg, err := server.DispatchDownloadTask(ctx, &protoReq)
 	return msg, metadata, err
@@ -286,6 +294,76 @@ func local_request_MikananiService_GetAnimeCount_0(ctx context.Context, marshale
 
 }
 
+func request_MikananiService_GetRecentUpdateList_0(ctx context.Context, marshaler runtime.Marshaler, client MikananiServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var protoReq emptypb.Empty
+	var metadata runtime.ServerMetadata
+
+	msg, err := client.GetRecentUpdateList(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
+	return msg, metadata, err
+
+}
+
+func local_request_MikananiService_GetRecentUpdateList_0(ctx context.Context, marshaler runtime.Marshaler, server MikananiServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var protoReq emptypb.Empty
+	var metadata runtime.ServerMetadata
+
+	msg, err := server.GetRecentUpdateList(ctx, &protoReq)
+	return msg, metadata, err
+
+}
+
+func request_MikananiService_DeleteRecentUpdateById_0(ctx context.Context, marshaler runtime.Marshaler, client MikananiServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var protoReq DelRecentUpdateByIdRequest
+	var metadata runtime.ServerMetadata
+
+	var (
+		val string
+		ok  bool
+		err error
+		_   = err
+	)
+
+	val, ok = pathParams["uid"]
+	if !ok {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "uid")
+	}
+
+	protoReq.Uid, err = runtime.Int64(val)
+	if err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "uid", err)
+	}
+
+	msg, err := client.DeleteRecentUpdateById(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
+	return msg, metadata, err
+
+}
+
+func local_request_MikananiService_DeleteRecentUpdateById_0(ctx context.Context, marshaler runtime.Marshaler, server MikananiServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var protoReq DelRecentUpdateByIdRequest
+	var metadata runtime.ServerMetadata
+
+	var (
+		val string
+		ok  bool
+		err error
+		_   = err
+	)
+
+	val, ok = pathParams["uid"]
+	if !ok {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "uid")
+	}
+
+	protoReq.Uid, err = runtime.Int64(val)
+	if err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "uid", err)
+	}
+
+	msg, err := server.DeleteRecentUpdateById(ctx, &protoReq)
+	return msg, metadata, err
+
+}
+
 // RegisterMikananiServiceHandlerServer registers the http handlers for service MikananiService to "mux".
 // UnaryRPC     :call MikananiServiceServer directly.
 // StreamingRPC :currently unsupported pending https://github.com/grpc/grpc-go/issues/906.
@@ -300,7 +378,7 @@ func RegisterMikananiServiceHandlerServer(ctx context.Context, mux *runtime.Serv
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/mikanani.MikananiService/ListAnimeMeta", runtime.WithHTTPPathPattern("/api/v1/mikanani/v2/anime/list-meta"))
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/mikanani.MikananiService/ListAnimeMeta", runtime.WithHTTPPathPattern("/mikanani/v2/anime/list-meta"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -325,7 +403,7 @@ func RegisterMikananiServiceHandlerServer(ctx context.Context, mux *runtime.Serv
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/mikanani.MikananiService/GetAnimeDoc", runtime.WithHTTPPathPattern("/api/v1/mikanani/v2/anime/doc/{uid}"))
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/mikanani.MikananiService/GetAnimeDoc", runtime.WithHTTPPathPattern("/mikanani/v2/anime/doc/{uid}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -350,7 +428,7 @@ func RegisterMikananiServiceHandlerServer(ctx context.Context, mux *runtime.Serv
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/mikanani.MikananiService/UpdateAnimeDoc", runtime.WithHTTPPathPattern("/api/v1/mikanani/v2/anime/update-doc"))
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/mikanani.MikananiService/UpdateAnimeDoc", runtime.WithHTTPPathPattern("/mikanani/v2/anime/update-doc"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -375,7 +453,7 @@ func RegisterMikananiServiceHandlerServer(ctx context.Context, mux *runtime.Serv
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/mikanani.MikananiService/UpdateAnimeMeta", runtime.WithHTTPPathPattern("/api/v1/mikanani/v2/anime/update-meta"))
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/mikanani.MikananiService/UpdateAnimeMeta", runtime.WithHTTPPathPattern("/mikanani/v2/anime/update-meta"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -400,7 +478,7 @@ func RegisterMikananiServiceHandlerServer(ctx context.Context, mux *runtime.Serv
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/mikanani.MikananiService/InsertAnimeItem", runtime.WithHTTPPathPattern("/api/v1/mikanani/v2/anime/insert"))
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/mikanani.MikananiService/InsertAnimeItem", runtime.WithHTTPPathPattern("/mikanani/v2/anime/insert"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -425,7 +503,7 @@ func RegisterMikananiServiceHandlerServer(ctx context.Context, mux *runtime.Serv
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/mikanani.MikananiService/DeleteAnimeItem", runtime.WithHTTPPathPattern("/api/v1/mikanani/v2/anime/delete/{uid}"))
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/mikanani.MikananiService/DeleteAnimeItem", runtime.WithHTTPPathPattern("/mikanani/v2/anime/delete/{uid}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -450,7 +528,7 @@ func RegisterMikananiServiceHandlerServer(ctx context.Context, mux *runtime.Serv
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/mikanani.MikananiService/DispatchDownloadTask", runtime.WithHTTPPathPattern("/api/v1/mikanani/v2/anime/dispatch-download"))
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/mikanani.MikananiService/DispatchDownloadTask", runtime.WithHTTPPathPattern("/mikanani/v2/anime/dispatch-download"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -475,7 +553,7 @@ func RegisterMikananiServiceHandlerServer(ctx context.Context, mux *runtime.Serv
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/mikanani.MikananiService/GetAnimeCount", runtime.WithHTTPPathPattern("/api/v1/mikanani/v2/anime/anime-count"))
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/mikanani.MikananiService/GetAnimeCount", runtime.WithHTTPPathPattern("/mikanani/v2/anime/anime-count"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -489,6 +567,56 @@ func RegisterMikananiServiceHandlerServer(ctx context.Context, mux *runtime.Serv
 		}
 
 		forward_MikananiService_GetAnimeCount_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+
+	})
+
+	mux.Handle("GET", pattern_MikananiService_GetRecentUpdateList_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		ctx, cancel := context.WithCancel(req.Context())
+		defer cancel()
+		var stream runtime.ServerTransportStream
+		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
+		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
+		var err error
+		var annotatedContext context.Context
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/mikanani.MikananiService/GetRecentUpdateList", runtime.WithHTTPPathPattern("/mikanani/v2/anime/recent-updates"))
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		resp, md, err := local_request_MikananiService_GetRecentUpdateList_0(annotatedContext, inboundMarshaler, server, req, pathParams)
+		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
+		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
+		if err != nil {
+			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
+			return
+		}
+
+		forward_MikananiService_GetRecentUpdateList_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+
+	})
+
+	mux.Handle("DELETE", pattern_MikananiService_DeleteRecentUpdateById_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		ctx, cancel := context.WithCancel(req.Context())
+		defer cancel()
+		var stream runtime.ServerTransportStream
+		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
+		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
+		var err error
+		var annotatedContext context.Context
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/mikanani.MikananiService/DeleteRecentUpdateById", runtime.WithHTTPPathPattern("/mikanani/v2/anime/recent/{uid}"))
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		resp, md, err := local_request_MikananiService_DeleteRecentUpdateById_0(annotatedContext, inboundMarshaler, server, req, pathParams)
+		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
+		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
+		if err != nil {
+			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
+			return
+		}
+
+		forward_MikananiService_DeleteRecentUpdateById_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
@@ -539,7 +667,7 @@ func RegisterMikananiServiceHandlerClient(ctx context.Context, mux *runtime.Serv
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/mikanani.MikananiService/ListAnimeMeta", runtime.WithHTTPPathPattern("/api/v1/mikanani/v2/anime/list-meta"))
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/mikanani.MikananiService/ListAnimeMeta", runtime.WithHTTPPathPattern("/mikanani/v2/anime/list-meta"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -561,7 +689,7 @@ func RegisterMikananiServiceHandlerClient(ctx context.Context, mux *runtime.Serv
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/mikanani.MikananiService/GetAnimeDoc", runtime.WithHTTPPathPattern("/api/v1/mikanani/v2/anime/doc/{uid}"))
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/mikanani.MikananiService/GetAnimeDoc", runtime.WithHTTPPathPattern("/mikanani/v2/anime/doc/{uid}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -583,7 +711,7 @@ func RegisterMikananiServiceHandlerClient(ctx context.Context, mux *runtime.Serv
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/mikanani.MikananiService/UpdateAnimeDoc", runtime.WithHTTPPathPattern("/api/v1/mikanani/v2/anime/update-doc"))
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/mikanani.MikananiService/UpdateAnimeDoc", runtime.WithHTTPPathPattern("/mikanani/v2/anime/update-doc"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -605,7 +733,7 @@ func RegisterMikananiServiceHandlerClient(ctx context.Context, mux *runtime.Serv
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/mikanani.MikananiService/UpdateAnimeMeta", runtime.WithHTTPPathPattern("/api/v1/mikanani/v2/anime/update-meta"))
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/mikanani.MikananiService/UpdateAnimeMeta", runtime.WithHTTPPathPattern("/mikanani/v2/anime/update-meta"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -627,7 +755,7 @@ func RegisterMikananiServiceHandlerClient(ctx context.Context, mux *runtime.Serv
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/mikanani.MikananiService/InsertAnimeItem", runtime.WithHTTPPathPattern("/api/v1/mikanani/v2/anime/insert"))
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/mikanani.MikananiService/InsertAnimeItem", runtime.WithHTTPPathPattern("/mikanani/v2/anime/insert"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -649,7 +777,7 @@ func RegisterMikananiServiceHandlerClient(ctx context.Context, mux *runtime.Serv
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/mikanani.MikananiService/DeleteAnimeItem", runtime.WithHTTPPathPattern("/api/v1/mikanani/v2/anime/delete/{uid}"))
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/mikanani.MikananiService/DeleteAnimeItem", runtime.WithHTTPPathPattern("/mikanani/v2/anime/delete/{uid}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -671,7 +799,7 @@ func RegisterMikananiServiceHandlerClient(ctx context.Context, mux *runtime.Serv
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/mikanani.MikananiService/DispatchDownloadTask", runtime.WithHTTPPathPattern("/api/v1/mikanani/v2/anime/dispatch-download"))
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/mikanani.MikananiService/DispatchDownloadTask", runtime.WithHTTPPathPattern("/mikanani/v2/anime/dispatch-download"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -693,7 +821,7 @@ func RegisterMikananiServiceHandlerClient(ctx context.Context, mux *runtime.Serv
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/mikanani.MikananiService/GetAnimeCount", runtime.WithHTTPPathPattern("/api/v1/mikanani/v2/anime/anime-count"))
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/mikanani.MikananiService/GetAnimeCount", runtime.WithHTTPPathPattern("/mikanani/v2/anime/anime-count"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -709,25 +837,73 @@ func RegisterMikananiServiceHandlerClient(ctx context.Context, mux *runtime.Serv
 
 	})
 
+	mux.Handle("GET", pattern_MikananiService_GetRecentUpdateList_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		ctx, cancel := context.WithCancel(req.Context())
+		defer cancel()
+		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
+		var err error
+		var annotatedContext context.Context
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/mikanani.MikananiService/GetRecentUpdateList", runtime.WithHTTPPathPattern("/mikanani/v2/anime/recent-updates"))
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		resp, md, err := request_MikananiService_GetRecentUpdateList_0(annotatedContext, inboundMarshaler, client, req, pathParams)
+		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
+		if err != nil {
+			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
+			return
+		}
+
+		forward_MikananiService_GetRecentUpdateList_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+
+	})
+
+	mux.Handle("DELETE", pattern_MikananiService_DeleteRecentUpdateById_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		ctx, cancel := context.WithCancel(req.Context())
+		defer cancel()
+		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
+		var err error
+		var annotatedContext context.Context
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/mikanani.MikananiService/DeleteRecentUpdateById", runtime.WithHTTPPathPattern("/mikanani/v2/anime/recent/{uid}"))
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		resp, md, err := request_MikananiService_DeleteRecentUpdateById_0(annotatedContext, inboundMarshaler, client, req, pathParams)
+		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
+		if err != nil {
+			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
+			return
+		}
+
+		forward_MikananiService_DeleteRecentUpdateById_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+
+	})
+
 	return nil
 }
 
 var (
-	pattern_MikananiService_ListAnimeMeta_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4, 2, 5}, []string{"api", "v1", "mikanani", "v2", "anime", "list-meta"}, ""))
+	pattern_MikananiService_ListAnimeMeta_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"mikanani", "v2", "anime", "list-meta"}, ""))
 
-	pattern_MikananiService_GetAnimeDoc_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4, 2, 5, 1, 0, 4, 1, 5, 6}, []string{"api", "v1", "mikanani", "v2", "anime", "doc", "uid"}, ""))
+	pattern_MikananiService_GetAnimeDoc_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4}, []string{"mikanani", "v2", "anime", "doc", "uid"}, ""))
 
-	pattern_MikananiService_UpdateAnimeDoc_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4, 2, 5}, []string{"api", "v1", "mikanani", "v2", "anime", "update-doc"}, ""))
+	pattern_MikananiService_UpdateAnimeDoc_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"mikanani", "v2", "anime", "update-doc"}, ""))
 
-	pattern_MikananiService_UpdateAnimeMeta_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4, 2, 5}, []string{"api", "v1", "mikanani", "v2", "anime", "update-meta"}, ""))
+	pattern_MikananiService_UpdateAnimeMeta_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"mikanani", "v2", "anime", "update-meta"}, ""))
 
-	pattern_MikananiService_InsertAnimeItem_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4, 2, 5}, []string{"api", "v1", "mikanani", "v2", "anime", "insert"}, ""))
+	pattern_MikananiService_InsertAnimeItem_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"mikanani", "v2", "anime", "insert"}, ""))
 
-	pattern_MikananiService_DeleteAnimeItem_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4, 2, 5, 1, 0, 4, 1, 5, 6}, []string{"api", "v1", "mikanani", "v2", "anime", "delete", "uid"}, ""))
+	pattern_MikananiService_DeleteAnimeItem_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4}, []string{"mikanani", "v2", "anime", "delete", "uid"}, ""))
 
-	pattern_MikananiService_DispatchDownloadTask_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4, 2, 5}, []string{"api", "v1", "mikanani", "v2", "anime", "dispatch-download"}, ""))
+	pattern_MikananiService_DispatchDownloadTask_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"mikanani", "v2", "anime", "dispatch-download"}, ""))
 
-	pattern_MikananiService_GetAnimeCount_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4, 2, 5}, []string{"api", "v1", "mikanani", "v2", "anime", "anime-count"}, ""))
+	pattern_MikananiService_GetAnimeCount_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"mikanani", "v2", "anime", "anime-count"}, ""))
+
+	pattern_MikananiService_GetRecentUpdateList_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"mikanani", "v2", "anime", "recent-updates"}, ""))
+
+	pattern_MikananiService_DeleteRecentUpdateById_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4}, []string{"mikanani", "v2", "anime", "recent", "uid"}, ""))
 )
 
 var (
@@ -746,4 +922,8 @@ var (
 	forward_MikananiService_DispatchDownloadTask_0 = runtime.ForwardResponseMessage
 
 	forward_MikananiService_GetAnimeCount_0 = runtime.ForwardResponseMessage
+
+	forward_MikananiService_GetRecentUpdateList_0 = runtime.ForwardResponseMessage
+
+	forward_MikananiService_DeleteRecentUpdateById_0 = runtime.ForwardResponseMessage
 )
