@@ -17,8 +17,8 @@ spec:
     spec:
       containers:
       - name: kapibara-apigateway
-        image: <DOCKER_HUB_REPO>/<KapibaraApiGatewayImage>
-        imagePullPolicy: Never
+        image: kapibara.harbor.com/<HARBOR_HUB_REPO>/<KapibaraApiGatewayImage>
+        imagePullPolicy: Always
         volumeMounts:
         - name: tls-secret
           mountPath: "/etc/tls"

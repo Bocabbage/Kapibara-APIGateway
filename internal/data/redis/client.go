@@ -1,4 +1,4 @@
-package redis_utils
+package redis
 
 import (
 	"kapibara-apigateway/internal/config"
@@ -10,7 +10,7 @@ import (
 var once sync.Once
 var singletonHandler *redis.Client
 
-func GetRedisClient() *redis.Client {
+func getRedisClient() *redis.Client {
 	once.Do(func() {
 		// read config
 		cfg := redis.Options{

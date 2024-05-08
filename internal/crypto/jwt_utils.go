@@ -3,9 +3,9 @@ package cryptoutils
 import (
 	"fmt"
 	"kapibara-apigateway/internal/config"
+	"kapibara-apigateway/internal/data/mysql/models"
 	kerrors "kapibara-apigateway/internal/errors"
 	"reflect"
-	"strconv"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
@@ -18,17 +18,16 @@ type JwtToken struct {
 	Roles    int64
 }
 
-func GenerateJWT(record map[string]string) (string, error) {
-	roleBitmap, _ := strconv.ParseInt(record["roleBitmap"], 2, 64)
+func GenerateJWT(record *models.User) (string, error) {
 	expTime := time.Now().Add(time.Duration(config.GlobalConfig.JWTConf.Expired) * time.Second).Unix()
 
 	token := jwt.NewWithClaims(
 		jwt.SigningMethodHS256,
 		jwt.MapClaims{
-			"username": record["username"],
-			"account":  record["account"],
+			"username": record.UserName,
+			"account":  record.Account,
 			"exp":      expTime,
-			"roles":    roleBitmap + config.GlobalConfig.MySQLConf.Salt,
+			"roles":    record.RoleBitmap + config.GlobalConfig.MySQLConf.Salt,
 		},
 	)
 

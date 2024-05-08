@@ -5,8 +5,8 @@ APIGateway service for self-service-system Kapibara.
 
 ## Build & Deploy
 ### 1. Modes
-- [x] Local demo
-- [ ] Kubernetes deploy configurations
+- Local demo
+- Kubernetes deploy configurations
 ### 2. How to start
 #### Local-demo: docker-compose
 ```shell
@@ -14,22 +14,23 @@ bash build/localdemo.sh
 ```
 #### gRPC protos
 ```shell
-cd protobufs && \
-protoc --go_out=../internal/mikanani_grpc_utils \
--I . -I ${PROTO_LIB}/include/ \
---go_opt=paths=source_relative \
---go-grpc_out=../internal/mikanani_grpc_utils \
---go-grpc_opt=paths=source_relative \
-mikanani_grpc.proto
+# GTPC_GATEWAY_THIRDPARTY_PATH="${HOME}/go/pkg/mod/github.com/grpc-ecosystem/grpc-gateway@v1.16.0/third_party/googleapis/"
+cd protobufs/ && protoc -I ${GTPC_GATEWAY_THIRDPARTY_PATH} -I . \
+  --go_out ../internal/grpc/mikanani \
+  --go_opt paths=source_relative \
+  --go-grpc_out ../internal/grpc/mikanani \
+  --go-grpc_opt paths=source_relative \
+  --grpc-gateway_out ../internal/grpc/mikanani \
+  --grpc-gateway_opt paths=source_relative \
+  mikanani_grpc.proto
 ```
 
 ## Todo
-### APIs
-- [x] Auth-APIs
-- Register
-- Login
-- [ ] WebCollector-related-APIs
-### Features
-- [ ] Swagger Documents
-- [x] HTTPs support
-- [ ] Traffic control
+- [x] Use `grpc-gateway` to replace hard-code http->grpc (mikanani)
+- [x] Use `GORM` to replace direct mysql access
+- [x] Extract code for Redis cache
+- [ ] Timeout setting
+- [ ] Traffic management
+- [ ] Params Validator
+- [ ] Configuration injected with yaml
+- [ ] API Document

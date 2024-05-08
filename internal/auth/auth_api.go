@@ -1,15 +1,14 @@
 package auth
 
 import (
-	"context"
 	"database/sql"
 	"errors"
 	"fmt"
 	"kapibara-apigateway/internal/config"
 	cryptoUtils "kapibara-apigateway/internal/crypto"
+	mysqlsdk "kapibara-apigateway/internal/data/mysql"
+	mysqlsdkMod "kapibara-apigateway/internal/data/mysql/models"
 	"kapibara-apigateway/internal/logger"
-	mysqlsdk "kapibara-apigateway/internal/mysql"
-	"kapibara-apigateway/internal/redis_utils"
 	"net/http"
 	"time"
 
@@ -31,82 +30,39 @@ func AuthLogin(c *gin.Context) {
 		return
 	}
 
-	// use redis as cache
-	redisClient := redis_utils.GetRedisClient()
-
-	// get related-account
-	var record map[string]string
-
-	getCacheTimeStart := time.Now()
-	recordCacheCtx, recordCacheCancel := context.WithTimeout(context.Background(), config.REDIS_CLI_TIMEOUT)
-	defer recordCacheCancel()
-	cacheRecord := redisClient.HGetAll(recordCacheCtx, config.AUTHCACHE_REDISKEY+":"+account)
-	if cacheRecord.Err() == nil && len(cacheRecord.Val()) > 0 {
-		logger.Debug(fmt.Sprintf("getrecord from redis: cost %.3f s.", time.Since(getCacheTimeStart).Seconds()))
-		record = cacheRecord.Val()
-	} else {
-		getRecordTimeStart := time.Now()
-
-		record, err = mysqlsdk.GetRecordByAccount(account)
-		if err != nil {
-			if errors.Is(err, sql.ErrNoRows) {
-				c.JSON(
-					http.StatusUnprocessableEntity,
-					gin.H{"error": "LOGIN ERROR: invalid account: not exists."},
-				)
-			} else {
-				logger.Error(fmt.Sprintf("LOGIN ERROR: user-database search error for [%s].", account))
-				c.JSON(
-					http.StatusInternalServerError,
-					gin.H{"error": "server internal error"},
-				)
-			}
-			return
-		}
-		logger.Debug(fmt.Sprintf("getrecord from mysql: cost %.3f s.", time.Since(getRecordTimeStart).Seconds()))
-
-		setRecordCacheCtx, setRecordCacheCancel := context.WithTimeout(context.Background(), config.REDIS_CLI_TIMEOUT)
-		defer setRecordCacheCancel()
-		hsetResult := redisClient.HSet(setRecordCacheCtx, config.AUTHCACHE_REDISKEY+":"+account, record)
-		if err = hsetResult.Err(); err != nil {
-			logger.Warn(fmt.Sprintf("[failed]set record-cache for account: [%s]: %v", account, err))
+	record, err := mysqlsdk.GetRecordByAccount(account)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			c.JSON(
+				http.StatusUnprocessableEntity,
+				gin.H{"error": "LOGIN ERROR: invalid account: not exists."},
+			)
 		} else {
-			logger.Debug(fmt.Sprintf("[success]set record-cache for account: [%s]", account))
+			logger.Error(fmt.Sprintf("LOGIN ERROR: user-database search error for [%s].", account))
+			c.JSON(
+				http.StatusInternalServerError,
+				gin.H{"error": "server internal error"},
+			)
 		}
+		return
 	}
 
 	// check the password
-	// first check redis cache
-	ctx, cancel := context.WithTimeout(context.Background(), config.REDIS_CLI_TIMEOUT)
-	defer cancel()
-	recentCheck := redisClient.Exists(ctx, config.IS_VALID_RECENT_REDISKEY+":"+account)
-	if recentCheck.Val() < 1 {
-		// if not, do slow bcryptcmp
-		bCryptTimeStart := time.Now()
-		storedPwdHash := record["pwdHash"]
-		compResult := cryptoUtils.BCryptHashCompare(storedPwdHash, pwd)
-		logger.Debug(fmt.Sprintf("bcrypt: cost %.3f s.", time.Since(bCryptTimeStart).Seconds()))
-		if !compResult {
-			c.JSON(
-				http.StatusUnprocessableEntity,
-				gin.H{"error": "LOGIN ERROR: incorrect pwd."},
-			)
-			return
-		}
-		storeCtx, storeCancel := context.WithTimeout(context.Background(), config.REDIS_CLI_TIMEOUT)
-		defer storeCancel()
-		setResult := redisClient.Set(storeCtx, config.IS_VALID_RECENT_REDISKEY+":"+account, 1, config.REDIS_AUTH_EXPIRE)
-		if e := setResult.Err(); e != nil {
-			logger.Warn(fmt.Sprintf("[failed]set auth-cache for account: [%s]: %v", account, e))
-		} else {
-			logger.Debug(fmt.Sprintf("[success]set auth-cache for account: [%s]", account))
-		}
+	bCryptTimeStart := time.Now()
+	storedPwdHash := record.PwdHash
+	compResult := cryptoUtils.BCryptHashCompare(storedPwdHash, pwd)
+	logger.Debug(fmt.Sprintf("bcrypt: cost %.3f s.", time.Since(bCryptTimeStart).Seconds()))
+	if !compResult {
+		c.JSON(
+			http.StatusUnprocessableEntity,
+			gin.H{"error": "LOGIN ERROR: incorrect pwd."},
+		)
+		return
 	}
 
 	// generate jwt
 	// [todo] enhancement: decoupling jwt-format
 	genJwtTimeStart := time.Now()
-	record["account"] = account
 	jwtToken, err := cryptoUtils.GenerateJWT(record)
 	if err != nil {
 		logger.Error(fmt.Sprintf("LOGIN ERROR: generate jwt-token error for [%s].", account))
@@ -131,7 +87,7 @@ func AuthLogin(c *gin.Context) {
 		http.StatusOK,
 		gin.H{
 			"access_token": jwtToken,
-			"user_name":    record["username"],
+			"user_name":    record.UserName,
 			"uuid":         uuid.NewV4(),
 		},
 	)
@@ -164,15 +120,14 @@ func AuthRegister(c *gin.Context) {
 		)
 		return
 	}
-	record := make(map[string]string)
-	record["account"] = account
-	record["username"] = username
-	record["pwdHash"] = pwdHash
 
-	_, err = mysqlsdk.RegisterNewUser(record)
+	err = mysqlsdk.RegisterNewUser(&mysqlsdkMod.User{
+		Account:  account,
+		UserName: username,
+		PwdHash:  pwdHash,
+	})
 	if err != nil {
 		logger.Debug(fmt.Sprintf("Register new user error: [%v]", err))
-		logger.Debug(fmt.Sprintf("REGISTER ERROR: record - [%v].", record))
 		c.JSON(
 			http.StatusUnprocessableEntity,
 			gin.H{"error": "REGISTER ERROR: user exists."},
